@@ -1,0 +1,2831 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MPI Fisika SMA: Gerak Lurus (Jarak, GLB, GLBB, GVA, GVB, GJB)</title>
+  <meta name="theme-color" content="#0284C7" />
+
+  <!-- PWA Manifest Inline via Data URI -->
+  <link rel="manifest" href="data:application/manifest+json,{&quot;name&quot;:&quot;MPI Fisika SMA: Gerak Lurus&quot;,&quot;short_name&quot;:&quot;Gerak Lurus&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#E0F2FE&quot;,&quot;theme_color&quot;:&quot;#0284C7&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230284C7'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle' fill='%23FACC15'%3E%E2%9A%9B%3C/text%3E%3C/svg%3E&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/svg+xml&quot;}]}" />
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- KaTeX for Crisp Physics Equations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
+    #mpi-app-root {
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      background: linear-gradient(135deg, #E0F2FE 0%, #F0F9FF 55%, #E0F2FE 100%);
+      overflow-y: auto;
+      overflow-x: hidden;
+      color: #0F172A;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 10px 25px -5px rgba(2, 132, 199, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #0369A1 0%, #0284C7 55%, #1D4ED8 100%);
+      box-shadow: 0 8px 24px -4px rgba(3, 105, 161, 0.35);
+    }
+    .nav-pill {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-pill.active {
+      background: linear-gradient(135deg, #FACC15 0%, #F59E0B 100%);
+      color: #0F172A !important;
+      font-weight: 800;
+      box-shadow: 0 6px 16px -2px rgba(245, 158, 11, 0.45);
+      transform: translateX(4px);
+    }
+    .nav-pill:not(.active) {
+      background: rgba(255, 255, 255, 0.88);
+      color: #1E3A8A;
+    }
+    .nav-pill:not(.active):hover {
+      background: #FFFFFF;
+      transform: translateX(3px);
+    }
+    .nav-pill.locked {
+      background: rgba(241, 245, 249, 0.85) !important;
+      color: #94A3B8 !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .step-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .step-card:not(.locked-card):hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 32px -8px rgba(2, 132, 199, 0.22);
+    }
+    .locked-card {
+      background: rgba(248, 250, 252, 0.88) !important;
+      border-color: #E2E8F0 !important;
+      cursor: not-allowed !important;
+      opacity: 0.78;
+    }
+    .formula-box {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      border: 1.5px solid #93C5FD;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+    #mpi-app-root::-webkit-scrollbar { width: 7px; height: 7px; }
+    #mpi-app-root::-webkit-scrollbar-track { background: #E0F2FE; }
+    #mpi-app-root::-webkit-scrollbar-thumb { background: #38BDF8; border-radius: 99px; }
+
+    @media (max-width: 1023px) {
+      .desktop-sidebar { display: none !important; }
+      .mobile-bottom-nav { display: flex !important; }
+      .main-content-area { padding-bottom: 96px !important; }
+    }
+    @media (min-width: 1024px) {
+      .desktop-sidebar { display: flex !important; }
+      .mobile-bottom-nav { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+<div id="mpi-app-root">
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-box" class="fixed top-4 right-4 z-[1000000] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- PREVIEW BANNER (Tampil HANYA saat IS_PREVIEW === true) -->
+  <div id="preview-banner" class="hidden bg-amber-400 text-slate-950 px-4 py-1.5 text-xs font-bold flex flex-wrap items-center justify-between gap-2 border-b border-amber-500 relative z-50">
+    <div class="flex items-center gap-2">
+      <span class="px-2 py-0.5 rounded-full bg-slate-900 text-amber-300 text-[10px] uppercase tracking-wider">Mode Preview Aktif</span>
+      <span>Tanpa login wajib aktif (progres tersimpan otomatis). Ubah <code>IS_PREVIEW = false</code> saat deploy ke Supabase.</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="window.quickLogin('siswa')" class="px-2.5 py-1 rounded-lg bg-sky-700 text-white hover:bg-sky-800 transition text-[11px] font-extrabold">Demo Akun Siswa</button>
+      <button onclick="window.quickLogin('admin')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition text-[11px] font-extrabold">Demo Panel Guru</button>
+    </div>
+  </div>
+
+  <!-- =======================================================================
+       LANDING PAGE ELEGAN DENGAN LOGIN SISWA & GURU TERINTEGRASI
+       ======================================================================= -->
+  <div id="landing-view" class="min-h-screen flex flex-col justify-between relative overflow-hidden">
+    <!-- Decorative Background Orbs -->
+    <div class="absolute -top-24 -left-24 w-96 h-96 bg-sky-300/35 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/3 -right-24 w-96 h-96 bg-amber-300/25 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 left-1/3 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Top Navbar Landing Page -->
+    <nav class="relative z-20 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-5 pb-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-sky-600 to-blue-700 text-white flex items-center justify-center shadow-lg shadow-sky-600/25">
+          <i data-lucide="atom" class="w-6 h-6 text-amber-300"></i>
+        </div>
+        <div>
+          <span class="block text-[10px] font-extrabold uppercase tracking-widest text-sky-700">Media Pembelajaran Interaktif</span>
+          <span class="text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">Fisika SMA • Kinematika Gerak Lurus</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2.5">
+        <button onclick="window.enterGuestMode('beranda')" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/90 hover:bg-white text-sky-800 border border-sky-200 text-xs font-extrabold shadow-sm transition">
+          <i data-lucide="compass" class="w-4 h-4 text-sky-600"></i>
+          <span>Akses Tamu (Tanpa Login)</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Hero & Integrated Login Split Grid -->
+    <div class="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <!-- LEFT: HERO PRESENTATION & CURRICULUM HIGHLIGHTS -->
+        <div class="lg:col-span-7 glass-card rounded-[2rem] p-6 sm:p-9 flex flex-col justify-between space-y-6 relative overflow-hidden">
+          <div class="space-y-4">
+            <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-100 border border-sky-200 text-sky-800 text-xs font-extrabold">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <span>Portal Belajar Interaktif • Kurikulum Fisika SMA</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-slate-900 leading-[1.15] tracking-tight">
+              Kuasai Konsep <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-600 to-blue-700">Gerak Lurus</span> Secara Visual & Terstruktur
+            </h1>
+
+            <p class="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
+              Belajar mandiri secara bertahap mulai dari <strong>Perbedaan Jarak & Perpindahan</strong>, <strong>GLB</strong>, <strong>GLBB</strong>, <strong>Gerak Vertikal ke Atas (GVA)</strong>, <strong>Gerak Vertikal ke Bawah (GVB)</strong>, hingga <strong>Gerak Jatuh Bebas (GJB)</strong> lengkap dengan simulasi interaktif tanpa perlu koneksi eksternal.
+            </p>
+          </div>
+
+          <!-- Highlight Feature Pills -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-2xl bg-sky-50/90 border border-sky-200">
+              <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-2">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-extrabold text-slate-900">6 Sub-Materi Inti</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Dilengkapi simulasi visual langsung di setiap materi.</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200">
+              <div class="w-8 h-8 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center mb-2">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-extrabold text-slate-900">Alur Berurutan</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Belajar berjenjang agar konsep dikuasai tuntas.</div>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-emerald-50/90 border border-emerald-200">
+              <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center mb-2">
+                <i data-lucide="database" class="w-4 h-4"></i>
+              </div>
+              <div class="text-xs font-extrabold text-slate-900">Sinkronisasi Kelas</div>
+              <div class="text-[11px] text-slate-600 mt-0.5">Progres siswa, refleksi & nilai evaluasi tersimpan.</div>
+            </div>
+          </div>
+
+          <!-- Quick Guest Access CTA -->
+          <div class="pt-2 border-t border-sky-100 flex flex-wrap items-center justify-between gap-3">
+            <span class="text-xs font-semibold text-slate-500">Ingin mencoba langsung tanpa masuk akun?</span>
+            <button onclick="window.enterGuestMode('beranda')" class="px-5 py-2.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs transition flex items-center gap-2">
+              <span>Masuk Sebagai Tamu</span>
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT: ELEGANT DUAL LOGIN CARD (SISWA & GURU) -->
+        <div class="lg:col-span-5 glass-card rounded-[2rem] p-6 sm:p-8 flex flex-col justify-between shadow-xl border-2 border-white">
+          <div>
+            <div class="flex items-center gap-3 mb-5">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-600 to-blue-700 text-white flex items-center justify-center shadow-lg shadow-sky-600/25 shrink-0">
+                <i data-lucide="shield-check" class="w-6 h-6 text-amber-300"></i>
+              </div>
+              <div>
+                <h2 class="text-xl font-extrabold text-slate-900">Portal Masuk Akun</h2>
+                <p class="text-xs text-slate-500 font-medium">Pilih peran akses Anda sebagai Siswa atau Guru</p>
+              </div>
+            </div>
+
+            <!-- Role Switch Tabs -->
+            <div class="grid grid-cols-2 gap-2 p-1.5 bg-sky-100/90 rounded-2xl mb-5 border border-sky-200">
+              <button type="button" id="tab-role-siswa" onclick="window.switchLoginTab('siswa')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-sky-800 shadow-sm transition flex items-center justify-center gap-1.5">
+                <i data-lucide="graduation-cap" class="w-4 h-4 text-sky-600"></i>
+                <span>Siswa</span>
+              </button>
+              <button type="button" id="tab-role-admin" onclick="window.switchLoginTab('admin')" class="py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5">
+                <i data-lucide="user-cog" class="w-4 h-4 text-amber-600"></i>
+                <span>Guru / Admin</span>
+              </button>
+            </div>
+
+            <!-- Sub-Mode Toggle Khusus Guru (Masuk vs Daftar Akun Guru Baru) -->
+            <div id="guru-auth-mode-bar" class="hidden mb-4 flex items-center justify-between gap-2 p-2 rounded-xl bg-amber-50 border border-amber-200 text-xs">
+              <span id="guru-mode-prompt" class="font-bold text-amber-900">Belum punya akun guru?</span>
+              <button type="button" id="guru-mode-toggle-btn" onclick="window.toggleGuruAuthMode()" class="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold transition">
+                Daftar Guru Baru
+              </button>
+            </div>
+
+            <!-- Role Info Badge -->
+            <div id="role-helper-box" class="mb-4 p-3 rounded-xl bg-blue-50/90 border border-blue-200 text-xs text-blue-900 font-medium flex items-start gap-2">
+              <i data-lucide="info" class="w-4 h-4 text-blue-600 shrink-0 mt-0.5"></i>
+              <span id="role-helper-text">Masuk menggunakan <strong>Username / NIS</strong> dan kata sandi yang diberikan oleh Guru Fisika untuk menyimpan progres belajar.</span>
+            </div>
+
+            <!-- Login / Register Form -->
+            <form id="login-form" onsubmit="window.handleLogin(event)" class="space-y-4">
+              <div id="guru-nama-field" class="hidden">
+                <label class="block text-xs font-extrabold text-slate-700 mb-1.5">Nama Lengkap Guru & Gelar</label>
+                <div class="relative">
+                  <input id="login-guru-nama" type="text" placeholder="Contoh: Budi Santoso, S.Pd." class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border-2 border-sky-200 focus:border-sky-500 focus:outline-none text-sm font-semibold text-slate-900" />
+                  <i data-lucide="badge-check" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                </div>
+              </div>
+
+              <div>
+                <label id="login-identifier-label" class="block text-xs font-extrabold text-slate-700 mb-1.5">Username / NIS Siswa</label>
+                <div class="relative">
+                  <input id="login-identifier" type="text" required placeholder="Contoh: siswa01" class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border-2 border-sky-200 focus:border-sky-500 focus:outline-none text-sm font-semibold text-slate-900" />
+                  <i data-lucide="user" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1.5">Kata Sandi</label>
+                <div class="relative">
+                  <input id="login-password" type="password" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 rounded-xl bg-white border-2 border-sky-200 focus:border-sky-500 focus:outline-none text-sm font-semibold text-slate-900" />
+                  <i data-lucide="key-round" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                </div>
+              </div>
+
+              <div id="login-error" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold"></div>
+
+              <button type="submit" id="login-submit-btn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 hover:to-blue-800 text-white font-extrabold text-sm shadow-lg shadow-sky-600/30 transition flex items-center justify-center gap-2">
+                <i data-lucide="log-in" class="w-4 h-4"></i>
+                <span id="login-submit-label">Masuk Sebagai Siswa</span>
+              </button>
+            </form>
+          </div>
+
+          <div class="mt-5 pt-4 border-t border-sky-100 text-center">
+            <p class="text-[11px] text-slate-500 font-semibold">
+              Akun Demo Preview: Siswa (<code class="text-sky-700 font-bold">siswa01</code> / <code class="text-sky-700 font-bold">123</code>) • Guru (<code class="text-amber-700 font-bold">admin@fisika.id</code> / <code class="text-amber-700 font-bold">123</code>)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: PREVIEW 6 CAKUPAN SUB-MATERI -->
+      <div class="space-y-4">
+        <div class="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-sky-700">Cakupan Kurikulum Kinematika</span>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">6 Sub-Materi Utama Gerak Lurus</h2>
+          </div>
+          <span class="text-xs font-bold text-slate-500">Klik kartu sub-materi untuk langsung membuka simulasi & pembahasan</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div onclick="window.enterGuestMateri('jarak')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 font-extrabold text-sm">01</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Perbedaan Jarak & Perpindahan</h3>
+              <p class="text-xs text-slate-600 mt-1">Besaran skalar panjang lintasan vs besaran vektor perubahan posisi ($\Delta x$).</p>
+            </div>
+          </div>
+
+          <div onclick="window.enterGuestMateri('glb')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0 font-extrabold text-sm">02</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Gerak Lurus Beraturan (GLB)</h3>
+              <p class="text-xs text-slate-600 mt-1">Lintasan lurus dengan kecepatan tetap ($v = s/t$) dan percepatan nol ($a = 0$).</p>
+            </div>
+          </div>
+
+          <div onclick="window.enterGuestMateri('glbb')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0 font-extrabold text-sm">03</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Gerak Lurus Berubah Beraturan</h3>
+              <p class="text-xs text-slate-600 mt-1">Gerak dipercepat maupun diperlambat dengan percepatan konstan ($a = \text{tetap}$).</p>
+            </div>
+          </div>
+
+          <div onclick="window.enterGuestMateri('gva')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-orange-100 text-orange-700 flex items-center justify-center shrink-0 font-extrabold text-sm">04</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Gerak Vertikal ke Atas (GVA)</h3>
+              <p class="text-xs text-slate-600 mt-1">Benda dilempar ke atas melawan gravitasi ($a = -g$) hingga titik tertinggi ($v_t = 0$).</p>
+            </div>
+          </div>
+
+          <div onclick="window.enterGuestMateri('gvb')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 font-extrabold text-sm">05</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Gerak Vertikal ke Bawah (GVB)</h3>
+              <p class="text-xs text-slate-600 mt-1">Benda dilempar ke bawah dengan kecepatan awal ($v_0 > 0$) searah gravitasi ($+g$).</p>
+            </div>
+          </div>
+
+          <div onclick="window.enterGuestMateri('gjb')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex items-start gap-3.5">
+            <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 font-extrabold text-sm">06</div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Gerak Jatuh Bebas (GJB)</h3>
+              <p class="text-xs text-slate-600 mt-1">Benda jatuh dari ketinggian tanpa kecepatan awal ($v_0 = 0$) dengan $t = \sqrt{2h/g}$.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: PREVIEW 5 ALUR BELAJAR (URUTAN BERJENJANG) -->
+      <div class="space-y-4">
+        <div>
+          <span class="text-xs font-extrabold uppercase tracking-wider text-amber-700">Alur Pembelajaran Berurutan (Sequential Unlock)</span>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">5 Menu Belajar Terstruktur</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div onclick="window.enterGuestMode('materi')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 text-white flex items-center justify-center shadow mb-3">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
+              </div>
+              <span class="text-[11px] font-extrabold text-blue-700">Urutan 01 • Terbuka</span>
+              <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">Materi Pemahaman Konsep</h3>
+              <p class="text-xs text-slate-600 mt-1">Ringkasan 6 sub-materi, rumus, grafik & simulasi konsep interaktif.</p>
+            </div>
+            <div class="mt-4 text-xs font-extrabold text-sky-700 flex items-center gap-1">Mulai Tahap 1 <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></div>
+          </div>
+
+          <div onclick="window.enterGuestMode('beranda')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 text-white flex items-center justify-center shadow mb-3">
+                <i data-lucide="flask-conical" class="w-5 h-5"></i>
+              </div>
+              <span class="text-[11px] font-extrabold text-orange-600">Urutan 02 • Bertahap</span>
+              <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">Simulasi Keterampilan Proses Sains</h3>
+              <p class="text-xs text-slate-600 mt-1">Lab virtual horizontal & vertikal dengan tabel pengamatan KPS.</p>
+            </div>
+            <div class="mt-4 text-xs font-extrabold text-slate-500 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Terbuka setelah Tahap 1</div>
+          </div>
+
+          <div onclick="window.enterGuestMode('beranda')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-600 to-purple-500 text-white flex items-center justify-center shadow mb-3">
+                <i data-lucide="compass" class="w-5 h-5"></i>
+              </div>
+              <span class="text-[11px] font-extrabold text-violet-700">Urutan 03 • Bertahap</span>
+              <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">Eksplorasi</h3>
+              <p class="text-xs text-slate-600 mt-1">Misi konsep, latihan 6 sub-materi & jurnal refleksi.</p>
+            </div>
+            <div class="mt-4 text-xs font-extrabold text-slate-500 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Terbuka setelah Tahap 2</div>
+          </div>
+
+          <div onclick="window.enterGuestMode('beranda')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-600 to-green-500 text-white flex items-center justify-center shadow mb-3">
+                <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+              </div>
+              <span class="text-[11px] font-extrabold text-emerald-700">Urutan 04 • Bertahap</span>
+              <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">Evaluasi</h3>
+              <p class="text-xs text-slate-600 mt-1">Uji kompetensi pilihan ganda dengan pembahasan otomatis.</p>
+            </div>
+            <div class="mt-4 text-xs font-extrabold text-slate-500 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Terbuka setelah Tahap 3</div>
+          </div>
+
+          <div onclick="window.enterGuestMode('beranda')" class="step-card glass-card rounded-2xl p-5 cursor-pointer flex flex-col justify-between">
+            <div>
+              <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-600 to-cyan-500 text-white flex items-center justify-center shadow mb-3">
+                <i data-lucide="trophy" class="w-5 h-5"></i>
+              </div>
+              <span class="text-[11px] font-extrabold text-teal-700">Urutan 05 • Bertahap</span>
+              <h3 class="text-sm font-extrabold text-slate-900 mt-0.5">Pencapaian</h3>
+              <p class="text-xs text-slate-600 mt-1">Lencana prestasi fisika & rapor ketuntasan belajar.</p>
+            </div>
+            <div class="mt-4 text-xs font-extrabold text-slate-500 flex items-center gap-1"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Terbuka setelah Tahap 4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Landing Page -->
+    <footer class="relative z-10 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 border-t border-sky-200/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 font-semibold">
+      <span>Media Pembelajaran Interaktif Fisika SMA • Materi Gerak Lurus</span>
+      <span>Portal Login Siswa & Guru • Simulasi Fisika Mandiri</span>
+    </footer>
+  </div>
+
+  <!-- =======================================================================
+       MAIN APPLICATION SHELL (HEADER + SIDEBAR + VIEWPORT)
+       ======================================================================= -->
+  <div id="app-shell" class="hidden min-h-screen flex flex-col">
+    <!-- TOP HEADER BANNER -->
+    <header class="header-banner text-white sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
+            <i data-lucide="atom" class="w-5 h-5 text-amber-300"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-extrabold uppercase tracking-wider text-amber-300">Fisika SMA • Kinematika</span>
+            </div>
+            <h1 class="text-base sm:text-xl font-extrabold leading-tight tracking-tight">Gerak Lurus: Memahami Pergerakan Satu Garis</h1>
+          </div>
+        </div>
+
+        <div class="hidden xl:flex items-center gap-2.5 bg-white/10 px-4 py-1.5 rounded-2xl border border-white/20">
+          <i data-lucide="lightbulb" class="w-4 h-4 text-amber-300 shrink-0"></i>
+          <span class="text-xs font-semibold text-sky-50">Fisika itu mudah, kalau kita <span class="text-amber-300 font-extrabold underline">paham konsepnya!</span></span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="text-right hidden sm:block mr-1">
+            <div id="user-display-name" class="text-xs font-extrabold text-white">Siswa Tamu</div>
+            <div id="user-display-role" class="text-[11px] font-medium text-sky-200">Akses Bebas</div>
+          </div>
+          <button onclick="window.goToLanding()" title="Halaman Sampul (Landing Page)" class="px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition border border-white/20 text-xs font-bold flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-300"></i>
+            <span class="hidden md:inline">Sampul</span>
+          </button>
+          <button onclick="window.navigate('beranda')" title="Ke Beranda Menu" class="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 transition border border-white/20">
+            <i data-lucide="home" class="w-4 h-4"></i>
+          </button>
+          <button id="header-auth-action-btn" onclick="window.handleHeaderAuthAction()" class="px-3 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-extrabold transition flex items-center gap-1.5 shadow">
+            <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+            <span id="header-auth-action-text">Login Akun</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- BODY CONTAINER -->
+    <div class="max-w-7xl w-full mx-auto flex-1 flex gap-6 px-4 sm:px-6 py-5 main-content-area">
+      <!-- DESKTOP LEFT SIDEBAR -->
+      <aside class="desktop-sidebar w-64 shrink-0 flex-col gap-2.5">
+        <div class="glass-card rounded-3xl p-3.5 flex flex-col gap-2 sticky top-24">
+          <div class="px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-sky-700">Urutan Menu Belajar</div>
+          <button data-nav="beranda" onclick="window.navigate('beranda')" class="nav-pill active flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-left">
+            <i data-lucide="layout-grid" class="w-4 h-4 shrink-0"></i><span>Beranda</span>
+          </button>
+          <button data-nav="materi" onclick="window.navigate('materi')" class="nav-pill flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-xs font-bold text-left">
+            <span class="flex items-center gap-2.5"><i data-lucide="book-open" class="w-4 h-4 text-blue-600 shrink-0"></i><span>1. Materi Pemahaman Konsep</span></span>
+            <i data-lock-icon="materi" data-lucide="unlock" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+          </button>
+          <button data-nav="simulasi" onclick="window.navigate('simulasi')" class="nav-pill flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-xs font-bold text-left">
+            <span class="flex items-center gap-2.5"><i data-lucide="flask-conical" class="w-4 h-4 text-orange-600 shrink-0"></i><span>2. Simulasi KPS</span></span>
+            <i data-lock-icon="simulasi" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+          </button>
+          <button data-nav="eksplorasi" onclick="window.navigate('eksplorasi')" class="nav-pill flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-xs font-bold text-left">
+            <span class="flex items-center gap-2.5"><i data-lucide="compass" class="w-4 h-4 text-violet-600 shrink-0"></i><span>3. Eksplorasi</span></span>
+            <i data-lock-icon="eksplorasi" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+          </button>
+          <button data-nav="evaluasi" onclick="window.navigate('evaluasi')" class="nav-pill flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-xs font-bold text-left">
+            <span class="flex items-center gap-2.5"><i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-600 shrink-0"></i><span>4. Evaluasi</span></span>
+            <i data-lock-icon="evaluasi" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+          </button>
+          <button data-nav="pencapaian" onclick="window.navigate('pencapaian')" class="nav-pill flex items-center justify-between gap-2 px-4 py-3 rounded-2xl text-xs font-bold text-left">
+            <span class="flex items-center gap-2.5"><i data-lucide="trophy" class="w-4 h-4 text-amber-500 shrink-0"></i><span>5. Pencapaian</span></span>
+            <i data-lock-icon="pencapaian" data-lucide="lock" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+          </button>
+
+          <!-- Admin Menu Item -->
+          <div id="sidebar-admin-section" class="hidden pt-2 mt-2 border-t border-sky-200">
+            <div class="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-rose-600">Panel Guru / Admin</div>
+            <button data-nav="admin" onclick="window.navigate('admin')" class="nav-pill w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-left">
+              <i data-lucide="shield-check" class="w-4 h-4 text-rose-600 shrink-0"></i><span>Kelola Data & Soal</span>
+            </button>
+          </div>
+
+          <div class="pt-2 mt-2 border-t border-sky-200">
+            <button onclick="window.goToLanding()" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-2xl text-xs font-bold text-slate-600 hover:text-sky-900 hover:bg-sky-50 transition text-left">
+              <i data-lucide="arrow-left-circle" class="w-4 h-4 text-sky-600 shrink-0"></i><span>Kembali ke Landing Page</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN DYNAMIC VIEWPORT -->
+      <main id="view-container" class="flex-1 min-w-0"></main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="mobile-bottom-nav fixed bottom-3 left-3 right-3 z-40 glass-card rounded-2xl px-1.5 py-2 justify-around items-center shadow-xl border-2 border-sky-200">
+      <button data-nav="beranda" onclick="window.navigate('beranda')" class="mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-sky-900">
+        <i data-lucide="home" class="w-4 h-4"></i><span>Beranda</span>
+      </button>
+      <button data-nav="materi" onclick="window.navigate('materi')" class="mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+        <i data-lucide="book-open" class="w-4 h-4"></i><span>Materi</span>
+      </button>
+      <button data-nav="simulasi" onclick="window.navigate('simulasi')" class="mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+        <i data-lucide="flask-conical" class="w-4 h-4"></i><span>Simulasi</span>
+      </button>
+      <button data-nav="eksplorasi" onclick="window.navigate('eksplorasi')" class="mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+        <i data-lucide="compass" class="w-4 h-4"></i><span>Eksplorasi</span>
+      </button>
+      <button data-nav="evaluasi" onclick="window.navigate('evaluasi')" class="mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+        <i data-lucide="clipboard-check" class="w-4 h-4"></i><span>Evaluasi</span>
+      </button>
+      <button data-nav="pencapaian" onclick="window.navigate('pencapaian')" class="mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-slate-600">
+        <i data-lucide="trophy" class="w-4 h-4"></i><span>Capaian</span>
+      </button>
+      <button id="mob-nav-admin" data-nav="admin" onclick="window.navigate('admin')" class="hidden mob-nav flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-xl text-[10px] font-bold text-rose-700">
+        <i data-lucide="shield-check" class="w-4 h-4"></i><span>Admin</span>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  // =========================================================================
+  // KONFIGURASI DEPLOYMENT SUPABASE
+  // Ubah IS_PREVIEW menjadi false saat deploy dan masukkan URL & ANON KEY asli
+  // =========================================================================
+  const IS_PREVIEW = false;
+  const SUPABASE_URL = "https://bhguqjfqzxnwoqbnyder.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_ZxQ2ncR3350aWH2uVzpwHg_JWkHg82m";
+
+  const supabase = (!IS_PREVIEW && SUPABASE_URL.startsWith('http'))
+    ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
+
+  // =========================================================================
+  // SERVICE WORKER DINAMIS (PWA 1 FILE)
+  // =========================================================================
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE_NAME = 'mpi-gerak-lurus-sma-v2';
+      self.addEventListener('install', (e) => self.skipWaiting());
+      self.addEventListener('activate', (e) => e.waitUntil(clients.claim()));
+      self.addEventListener('fetch', (e) => {
+        e.respondWith(fetch(e.request).catch(() => new Response('Mode Offline')));
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+  }
+
+  // =========================================================================
+  // STATE APLIKASI & DATA DUMMY MINIMALIS (HANYA AKTIF SAAT IS_PREVIEW = true)
+  // =========================================================================
+  const state = {
+    loginRole: 'siswa',
+    guruAuthMode: 'login', // 'login' | 'register'
+    currentUser: null,
+    currentPage: 'beranda',
+    materiTab: 'jarak',
+    progres: {
+      materi_selesai: false,
+      simulasi_selesai: false,
+      eksplorasi_selesai: false,
+      evaluasi_selesai: false,
+      skor_latihan: 0,
+      skor_evaluasi: 0
+    },
+    kpsLogs: [],
+    previewGuruList: IS_PREVIEW ? [
+      { id: 'admin-preview', email: 'admin@fisika.id', password: '123', nama: 'Guru Fisika (Demo)' },
+      { id: 'guru-2', email: 'guru2@fisika.id', password: '123', nama: 'Ibu Rina Kartika, S.Pd.' }
+    ] : [],
+    siswaList: IS_PREVIEW ? [
+      { id: '11111111-1111-1111-1111-111111111111', guru_id: 'admin-preview', username: 'siswa01', password: '123', nama_lengkap: 'Andi Pratama', kelas: 'XI IPA 1' },
+      { id: '22222222-2222-2222-2222-222222222222', guru_id: 'admin-preview', username: 'siswa02', password: '123', nama_lengkap: 'Siti Rahmawati', kelas: 'XI IPA 1' },
+      { id: '33333333-3333-3333-3333-333333333333', guru_id: 'guru-2', username: 'siswa_rina', password: '123', nama_lengkap: 'Bima Sakti', kelas: 'XI IPA 3' }
+    ] : [],
+    bankSoal: IS_PREVIEW ? [
+      {
+        id: 's1',
+        guru_id: 'admin-preview',
+        tipe_soal: 'pg',
+        kategori: 'Jarak & Perpindahan',
+        pertanyaan: 'Seseorang berjalan ke timur sejauh 40 m lalu berbalik ke barat sejauh 10 m. Berapakah jarak dan perpindahan orang tersebut?',
+        opsi_a: 'Jarak 30 m, Perpindahan 50 m',
+        opsi_b: 'Jarak 50 m, Perpindahan 30 m ke timur',
+        opsi_c: 'Jarak 50 m, Perpindahan 30 m ke barat',
+        opsi_d: 'Jarak 40 m, Perpindahan 10 m',
+        opsi_e: 'Jarak 50 m, Perpindahan 50 m ke timur',
+        kunci_jawaban: 'B',
+        pembahasan: 'Jarak adalah panjang total lintasan: 40 + 10 = 50 m. Perpindahan adalah selisih posisi akhir dan awal: 40 - 10 = 30 m ke timur.'
+      },
+      {
+        id: 's2',
+        guru_id: 'admin-preview',
+        tipe_soal: 'pg_kompleks',
+        kategori: 'GLB',
+        pertanyaan: 'Pilihlah semua pernyataan yang BENAR mengenai karakteristik Gerak Lurus Beraturan (GLB)! (Bisa lebih dari satu jawaban)',
+        opsi_a: 'Kecepatan benda selalu tetap (konstan) baik besar maupun arahnya',
+        opsi_b: 'Percepatan benda bernilai nol (a = 0)',
+        opsi_c: 'Grafik hubungan kecepatan terhadap waktu (v - t) berbentuk parabola',
+        opsi_d: 'Dalam selang waktu yang sama, benda menempuh jarak yang selalu sama',
+        opsi_e: 'Benda mengalami penambahan kelajuan secara teratur setiap sekon',
+        kunci_jawaban: 'A,B,D',
+        pembahasan: 'Pada GLB, kecepatan tetap, percepatan nol, dan jarak yang ditemuh tiap satuan waktu selalu sama. Grafik v-t berbentuk garis mendatar.'
+      },
+      {
+        id: 's3',
+        guru_id: 'admin-preview',
+        tipe_soal: 'benar_salah',
+        kategori: 'GVA',
+        pertanyaan: 'Pada Gerak Vertikal ke Atas (GVA), saat benda mencapai titik tertinggi, kecepatan sesaat benda bernilai nol (v_t = 0) dan percepatan gravitasinya juga menjadi nol.',
+        opsi_a: 'Benar',
+        opsi_b: 'Salah',
+        opsi_c: '',
+        opsi_d: '',
+        opsi_e: '',
+        kunci_jawaban: 'Salah',
+        pembahasan: 'Pernyataan tersebut SALAH karena pada titik tertinggi kecepatan sesaat memang nol (v_t = 0), tetapi percepatan gravitasi bumi (g) tetap bekerja ke arah bawah.'
+      },
+      {
+        id: 's4',
+        guru_id: 'admin-preview',
+        tipe_soal: 'menjodohkan',
+        kategori: 'GLBB & Vertikal',
+        pertanyaan: 'Jodohkan jenis gerak lurus di kolom kiri dengan ciri persamaan/besaran yang paling sesuai di kolom kanan!',
+        pasangan_kiri: [
+          'Gerak Lurus Beraturan (GLB)',
+          'Gerak Jatuh Bebas (GJB)',
+          'Gerak Vertikal ke Atas (GVA)'
+        ],
+        pasangan_kanan: [
+          'v_0 = 0 dan a = +g',
+          'a = 0 dan v = konstan',
+          'v_t = 0 di puncak dan a = -g'
+        ],
+        kunci_jawaban: '1-B,2-A,3-C',
+        pembahasan: 'GLB memiliki a = 0 (1-B); GJB dilepas tanpa kecepatan awal v_0 = 0 (2-A); GVA bergerak melawan gravitasi a = -g (3-C).'
+      },
+      {
+        id: 's5',
+        guru_id: 'admin-preview',
+        tipe_soal: 'isian_singkat',
+        kategori: 'GJB',
+        pertanyaan: 'Sebuah kelapa jatuh bebas dari ketinggian 45 m (g = 10 m/s²). Waktu yang diperlukan kelapa untuk menyentuh tanah adalah ... sekon. (Tulis angkanya saja)',
+        opsi_a: '',
+        opsi_b: '',
+        opsi_c: '',
+        opsi_d: '',
+        opsi_e: '',
+        kunci_jawaban: '3',
+        pembahasan: 't = √(2h / g) = √(2 × 45 / 10) = √9 = 3 sekon.'
+      },
+      {
+        id: 's6-rina',
+        guru_id: 'guru-2',
+        tipe_soal: 'pg',
+        kategori: 'GLB',
+        pertanyaan: '[Soal Khusus Kelas Ibu Rina] Sebuah kereta melaju dengan kecepatan tetap 72 km/jam selama 10 sekon. Jarak yang ditempuh kereta adalah...',
+        opsi_a: '72 m',
+        opsi_b: '100 m',
+        opsi_c: '200 m',
+        opsi_d: '720 m',
+        opsi_e: '20 m',
+        kunci_jawaban: 'C',
+        pembahasan: '72 km/jam = 20 m/s. Jarak s = v × t = 20 × 10 = 200 m.'
+      }
+    ] : [],
+    refleksiList: IS_PREVIEW ? [
+      {
+        id: 'r1',
+        guru_id: 'admin-preview',
+        siswa_id: '11111111-1111-1111-1111-111111111111',
+        nama_siswa: 'Andi Pratama',
+        pemahaman_inti: 'Jarak merupakan besaran skalar sedangkan perpindahan besaran vektor. Pada gerak vertikal, percepatan gravitasi g selalu mengarah ke bawah.',
+        bagian_sulit: 'Menentukan tanda +g dan -g pada GVA dan GVB.',
+        tingkat_paham: 4,
+        created_at: new Date().toISOString()
+      }
+    ] : []
+  };
+
+  if (IS_PREVIEW) {
+    document.getElementById('preview-banner').classList.remove('hidden');
+  }
+
+  // =========================================================================
+  // UTILITY FUNCTIONS (TOAST, MATH RENDERER, HTML ESCAPE)
+  // =========================================================================
+  function showToast(msg, type = 'info') {
+    const box = document.getElementById('toast-box');
+    if (!box) return;
+    const item = document.createElement('div');
+    const colors = {
+      success: 'bg-emerald-600 text-white border-emerald-400',
+      error: 'bg-rose-600 text-white border-rose-400',
+      warning: 'bg-amber-500 text-slate-950 border-amber-300',
+      info: 'bg-sky-700 text-white border-sky-400'
+    };
+    item.className = `px-4 py-3 rounded-2xl shadow-xl border text-xs font-extrabold transition-all duration-300 ${colors[type] || colors.info}`;
+    item.textContent = msg;
+    box.appendChild(item);
+    setTimeout(() => {
+      item.style.opacity = '0';
+      setTimeout(() => item.remove(), 300);
+    }, 3200);
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function renderMath() {
+    if (typeof window.renderMathInElement === 'function') {
+      window.renderMathInElement(document.getElementById('mpi-app-root'), {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '$', right: '$', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+
+  // =========================================================================
+  // AUTHENTICATION, GUEST ACCESS & LANDING NAVIGATION
+  // =========================================================================
+  window.switchLoginTab = (role) => {
+    state.loginRole = role;
+    state.guruAuthMode = 'login';
+    const tabSiswa = document.getElementById('tab-role-siswa');
+    const tabAdmin = document.getElementById('tab-role-admin');
+    const guruBar = document.getElementById('guru-auth-mode-bar');
+    const guruNamaField = document.getElementById('guru-nama-field');
+    const label = document.getElementById('login-identifier-label');
+    const input = document.getElementById('login-identifier');
+    const helper = document.getElementById('role-helper-text');
+    const submitLabel = document.getElementById('login-submit-label');
+
+    guruNamaField.classList.add('hidden');
+    document.getElementById('login-guru-nama').required = false;
+
+    if (role === 'siswa') {
+      tabSiswa.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-sky-800 shadow-sm transition flex items-center justify-center gap-1.5';
+      tabAdmin.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5';
+      guruBar.classList.add('hidden');
+      label.textContent = 'Username / NIS Siswa';
+      input.type = 'text';
+      input.placeholder = 'Contoh: siswa01';
+      helper.innerHTML = 'Masuk menggunakan <strong>Username / NIS</strong> dan kata sandi yang diberikan oleh Guru Anda untuk mengerjakan soal khusus kelas Anda.';
+      submitLabel.textContent = 'Masuk Sebagai Siswa';
+    } else {
+      tabAdmin.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold bg-white text-amber-800 shadow-sm transition flex items-center justify-center gap-1.5';
+      tabSiswa.className = 'py-2.5 px-3 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition flex items-center justify-center gap-1.5';
+      guruBar.classList.remove('hidden');
+      document.getElementById('guru-mode-prompt').textContent = 'Belum punya akun guru?';
+      document.getElementById('guru-mode-toggle-btn').textContent = 'Daftar Guru Baru';
+      label.textContent = 'Email Guru';
+      input.type = 'email';
+      input.placeholder = 'guru@sekolah.sch.id';
+      helper.innerHTML = 'Masuk ke ruang kelas Anda untuk mengelola <strong>daftar siswa Anda sendiri</strong> dan <strong>bank soal evaluasi khusus kelas Anda</strong>.';
+      submitLabel.textContent = 'Masuk Panel Guru';
+    }
+    document.getElementById('login-error').classList.add('hidden');
+  };
+
+  window.toggleGuruAuthMode = () => {
+    const isReg = state.guruAuthMode === 'login';
+    state.guruAuthMode = isReg ? 'register' : 'login';
+    const guruNamaField = document.getElementById('guru-nama-field');
+    const guruNamaInput = document.getElementById('login-guru-nama');
+    const prompt = document.getElementById('guru-mode-prompt');
+    const toggleBtn = document.getElementById('guru-mode-toggle-btn');
+    const helper = document.getElementById('role-helper-text');
+    const submitLabel = document.getElementById('login-submit-label');
+
+    if (isReg) {
+      guruNamaField.classList.remove('hidden');
+      guruNamaInput.required = true;
+      prompt.textContent = 'Sudah memiliki akun guru?';
+      toggleBtn.textContent = 'Kembali Login';
+      helper.innerHTML = 'Buat <strong>Akun Guru Baru</strong> langsung dari aplikasi ini tanpa perlu membuka dasbor Supabase. Anda akan memiliki ruang siswa & bank soal terpisah.';
+      submitLabel.textContent = 'Buat Akun Guru & Masuk';
+    } else {
+      guruNamaField.classList.add('hidden');
+      guruNamaInput.required = false;
+      prompt.textContent = 'Belum punya akun guru?';
+      toggleBtn.textContent = 'Daftar Guru Baru';
+      helper.innerHTML = 'Masuk ke ruang kelas Anda untuk mengelola <strong>daftar siswa Anda sendiri</strong> dan <strong>bank soal evaluasi khusus kelas Anda</strong>.';
+      submitLabel.textContent = 'Masuk Panel Guru';
+    }
+    document.getElementById('login-error').classList.add('hidden');
+  };
+
+  window.quickLogin = (role) => {
+    if (!IS_PREVIEW) return;
+    if (role === 'admin') {
+      const g = state.previewGuruList[0];
+      state.currentUser = { id: g.id, guru_id: g.id, role: 'admin', nama: g.nama, kelas: 'Ruang Guru', username: g.email };
+    } else {
+      const s = state.siswaList[0];
+      state.currentUser = { id: s.id, guru_id: s.guru_id, role: 'siswa', nama: s.nama_lengkap, kelas: s.kelas, username: s.username };
+    }
+    enterApp('beranda');
+    showToast(`Berhasil masuk sebagai ${state.currentUser.nama}`, 'success');
+  };
+
+  window.enterGuestMode = (targetPage = 'beranda') => {
+    state.currentUser = { id: 'guest', guru_id: null, role: 'guest', nama: 'Siswa Tamu', kelas: 'Akses Bebas', username: 'tamu' };
+    enterApp(targetPage);
+  };
+
+  window.enterGuestMateri = (subKey) => {
+    state.materiTab = subKey;
+    if (!state.currentUser) {
+      state.currentUser = { id: 'guest', guru_id: null, role: 'guest', nama: 'Siswa Tamu', kelas: 'Akses Bebas', username: 'tamu' };
+    }
+    enterApp('materi');
+  };
+
+  window.goToLanding = () => {
+    stopSimLoop();
+    document.getElementById('app-shell').classList.add('hidden');
+    document.getElementById('landing-view').classList.remove('hidden');
+    lucide.createIcons();
+    renderMath();
+  };
+
+  window.handleHeaderAuthAction = async () => {
+    if (state.currentUser && state.currentUser.role !== 'guest') {
+      if (!IS_PREVIEW && supabase && state.currentUser.role === 'admin') {
+        await supabase.auth.signOut();
+      }
+      state.currentUser = null;
+      showToast('Anda telah keluar dari akun.', 'info');
+    }
+    window.goToLanding();
+  };
+
+  window.handleLogin = async (e) => {
+    e.preventDefault();
+    const idVal = document.getElementById('login-identifier').value.trim();
+    const passVal = document.getElementById('login-password').value.trim();
+    const namaGuruVal = document.getElementById('login-guru-nama')?.value.trim() || '';
+    const errBox = document.getElementById('login-error');
+    const btn = document.getElementById('login-submit-btn');
+    errBox.classList.add('hidden');
+    btn.disabled = true;
+
+    try {
+      if (IS_PREVIEW) {
+        if (state.loginRole === 'admin') {
+          if (state.guruAuthMode === 'register') {
+            if (!namaGuruVal) throw new Error('Nama lengkap guru wajib diisi.');
+            const exists = state.previewGuruList.find(g => g.email.toLowerCase() === idVal.toLowerCase());
+            if (exists) throw new Error('Email guru tersebut sudah terdaftar.');
+            const newGuru = { id: 'guru-' + Date.now(), email: idVal, password: passVal, nama: namaGuruVal };
+            state.previewGuruList.push(newGuru);
+            state.currentUser = { id: newGuru.id, guru_id: newGuru.id, role: 'admin', nama: newGuru.nama, kelas: 'Ruang Guru', username: newGuru.email };
+            enterApp('admin');
+            showToast(`Akun guru ${newGuru.nama} berhasil dibuat! Silakan tambah siswa & soal Anda.`, 'success');
+            return;
+          } else {
+            const gFound = state.previewGuruList.find(g => g.email.toLowerCase() === idVal.toLowerCase());
+            if (gFound && gFound.password !== passVal) throw new Error('Kata sandi guru salah.');
+            const gUse = gFound || { id: 'guru-' + idVal, email: idVal, nama: idVal };
+            state.currentUser = { id: gUse.id, guru_id: gUse.id, role: 'admin', nama: gUse.nama, kelas: 'Ruang Guru', username: gUse.email };
+          }
+        } else {
+          const found = state.siswaList.find(s => s.username === idVal && s.password === passVal);
+          if (!found) throw new Error('Username atau kata sandi siswa tidak cocok (Coba: siswa01 / 123).');
+          state.currentUser = { id: found.id, guru_id: found.guru_id, role: 'siswa', nama: found.nama_lengkap, kelas: found.kelas, username: found.username };
+        }
+        enterApp('beranda');
+        showToast(`Selamat datang, ${state.currentUser.nama}!`, 'success');
+        return;
+      }
+
+      if (!supabase) throw new Error('Konfigurasi SUPABASE_URL dan SUPABASE_ANON_KEY belum diisi.');
+
+      if (state.loginRole === 'admin') {
+        if (state.guruAuthMode === 'register') {
+          if (!namaGuruVal) throw new Error('Nama lengkap guru wajib diisi.');
+          const { data, error } = await supabase.auth.signUp({
+            email: idVal,
+            password: passVal,
+            options: { data: { nama_lengkap: namaGuruVal } }
+          });
+          if (error) throw new Error('Pendaftaran Guru gagal: ' + error.message);
+          if (!data.session) {
+            throw new Error('Akun guru berhasil didaftarkan! Silakan cek email untuk verifikasi (atau nonaktifkan Confirm Email di Supabase Auth) lalu login.');
+          }
+          state.currentUser = {
+            id: data.user.id,
+            guru_id: data.user.id,
+            role: 'admin',
+            nama: namaGuruVal,
+            kelas: 'Ruang Guru',
+            username: data.user.email
+          };
+          await loadUserDataFromSupabase();
+          enterApp('admin');
+          showToast(`Akun Guru ${namaGuruVal} berhasil dibuat!`, 'success');
+          return;
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email: idVal, password: passVal });
+          if (error) throw new Error('Login Guru gagal: ' + error.message);
+          const displayNama = data.user.user_metadata?.nama_lengkap || data.user.email;
+          state.currentUser = {
+            id: data.user.id,
+            guru_id: data.user.id,
+            role: 'admin',
+            nama: displayNama,
+            kelas: 'Ruang Guru',
+            username: data.user.email
+          };
+        }
+      } else {
+        const { data, error } = await supabase
+          .from('siswa')
+          .select('*')
+          .eq('username', idVal)
+          .eq('password', passVal)
+          .maybeSingle();
+        if (error) throw new Error('Gagal memeriksa akun siswa: ' + error.message);
+        if (!data) throw new Error('Username atau kata sandi siswa salah.');
+        state.currentUser = {
+          id: data.id,
+          guru_id: data.guru_id || null,
+          role: 'siswa',
+          nama: data.nama_lengkap,
+          kelas: data.kelas,
+          username: data.username
+        };
+      }
+      await loadUserDataFromSupabase();
+      enterApp('beranda');
+      showToast(`Selamat datang, ${state.currentUser.nama}!`, 'success');
+    } catch (err) {
+      errBox.textContent = err.message;
+      errBox.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  async function loadUserDataFromSupabase() {
+    if (IS_PREVIEW || !supabase) return;
+
+    if (state.currentUser?.role === 'siswa') {
+      // Hanya muat soal evaluasi milik guru yang mendaftarkan siswa ini
+      let soalQuery = supabase.from('bank_soal').select('*').order('created_at', { ascending: true });
+      if (state.currentUser.guru_id) {
+        soalQuery = soalQuery.eq('guru_id', state.currentUser.guru_id);
+      } else {
+        soalQuery = soalQuery.is('guru_id', null);
+      }
+      const { data: soalData } = await soalQuery;
+      state.bankSoal = soalData || [];
+
+      const { data: prog } = await supabase
+        .from('progres_belajar')
+        .select('*')
+        .eq('siswa_id', state.currentUser.id)
+        .maybeSingle();
+      if (prog) {
+        state.progres = {
+          materi_selesai: !!prog.materi_selesai,
+          simulasi_selesai: !!prog.simulasi_selesai,
+          eksplorasi_selesai: !!prog.eksplorasi_selesai,
+          evaluasi_selesai: (prog.skor_evaluasi || 0) > 0,
+          skor_latihan: prog.skor_latihan || 0,
+          skor_evaluasi: prog.skor_evaluasi || 0
+        };
+      } else {
+        await supabase.from('progres_belajar').insert([{ siswa_id: state.currentUser.id }]);
+      }
+      const { data: refl } = await supabase
+        .from('refleksi_siswa')
+        .select('*')
+        .eq('siswa_id', state.currentUser.id)
+        .order('created_at', { ascending: false });
+      if (refl) state.refleksiList = refl;
+    } else if (state.currentUser?.role === 'admin') {
+      const guruId = state.currentUser.id;
+      // Guru hanya melihat soal, siswa, dan refleksi miliknya sendiri
+      const [{ data: soalData }, { data: sList }, { data: rList }] = await Promise.all([
+        supabase.from('bank_soal').select('*').eq('guru_id', guruId).order('created_at', { ascending: true }),
+        supabase.from('siswa').select('*').eq('guru_id', guruId).order('created_at', { ascending: false }),
+        supabase.from('refleksi_siswa').select('*, siswa(nama_lengkap, kelas)').eq('guru_id', guruId).order('created_at', { ascending: false })
+      ]);
+      state.bankSoal = soalData || [];
+      state.siswaList = sList || [];
+      state.refleksiList = (rList || []).map(r => ({
+        ...r,
+        nama_siswa: r.siswa?.nama_lengkap || 'Siswa'
+      }));
+    }
+  }
+
+  async function syncProgres(updates) {
+    Object.assign(state.progres, updates);
+    if (!IS_PREVIEW && supabase && state.currentUser?.role === 'siswa') {
+      await supabase
+        .from('progres_belajar')
+        .update({
+          materi_selesai: state.progres.materi_selesai,
+          simulasi_selesai: state.progres.simulasi_selesai,
+          eksplorasi_selesai: state.progres.eksplorasi_selesai,
+          skor_latihan: state.progres.skor_latihan,
+          skor_evaluasi: state.progres.skor_evaluasi,
+          updated_at: new Date().toISOString()
+        })
+        .eq('siswa_id', state.currentUser.id);
+    }
+  }
+
+  function enterApp(initialPage = 'beranda') {
+    document.getElementById('landing-view').classList.add('hidden');
+    document.getElementById('app-shell').classList.remove('hidden');
+
+    const user = state.currentUser || { role: 'guest', nama: 'Siswa Tamu', kelas: 'Akses Bebas' };
+    document.getElementById('user-display-name').textContent = user.nama;
+    document.getElementById('user-display-role').textContent = user.kelas;
+
+    const isAdmin = user.role === 'admin';
+    const isGuest = user.role === 'guest';
+    document.getElementById('sidebar-admin-section').classList.toggle('hidden', !isAdmin);
+    document.getElementById('mob-nav-admin').classList.toggle('hidden', !isAdmin);
+    document.getElementById('header-auth-action-text').textContent = isGuest ? 'Login Akun' : 'Keluar Akun';
+
+    updateNavigationLockUI();
+    window.navigate(initialPage);
+  }
+
+  // =========================================================================
+  // SEQUENTIAL LOCKING & ROUTING
+  // =========================================================================
+  function isStepUnlocked(stepKey) {
+    if (state.currentUser?.role === 'admin') return true;
+    const p = state.progres;
+    if (stepKey === 'beranda' || stepKey === 'materi') return true;
+    if (stepKey === 'simulasi') return p.materi_selesai;
+    if (stepKey === 'eksplorasi') return p.materi_selesai && p.simulasi_selesai;
+    if (stepKey === 'evaluasi') return p.materi_selesai && p.simulasi_selesai && p.eksplorasi_selesai;
+    if (stepKey === 'pencapaian') return p.materi_selesai && p.simulasi_selesai && p.eksplorasi_selesai && p.evaluasi_selesai;
+    if (stepKey === 'admin') return state.currentUser?.role === 'admin';
+    return false;
+  }
+
+  function updateNavigationLockUI() {
+    const keys = ['materi', 'simulasi', 'eksplorasi', 'evaluasi', 'pencapaian'];
+    keys.forEach(k => {
+      const unlocked = isStepUnlocked(k);
+      const navBtn = document.querySelector(`.nav-pill[data-nav="${k}"]`);
+      if (navBtn) {
+        navBtn.classList.toggle('locked', !unlocked);
+      }
+      const lockIcon = document.querySelector(`[data-lock-icon="${k}"]`);
+      if (lockIcon) {
+        lockIcon.setAttribute('data-lucide', unlocked ? 'unlock' : 'lock');
+        lockIcon.setAttribute('class', unlocked
+          ? 'w-3.5 h-3.5 text-emerald-600 shrink-0'
+          : 'w-3.5 h-3.5 text-slate-400 shrink-0');
+      }
+    });
+  }
+
+  window.navigate = (page) => {
+    if (!isStepUnlocked(page)) {
+      showToast('Tahap ini masih terkunci! Selesaikan urutan belajar sebelumnya terlebih dahulu.', 'warning');
+      return;
+    }
+
+    stopSimLoop();
+    state.currentPage = page;
+    updateNavigationLockUI();
+
+    document.querySelectorAll('.nav-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.nav === page);
+    });
+    document.querySelectorAll('.mob-nav').forEach(btn => {
+      if (btn.dataset.nav === page) {
+        btn.classList.add('bg-amber-400', 'text-slate-950');
+        btn.classList.remove('text-slate-600');
+      } else {
+        btn.classList.remove('bg-amber-400', 'text-slate-950');
+        btn.classList.add('text-slate-600');
+      }
+    });
+
+    const container = document.getElementById('view-container');
+    if (page === 'beranda') renderBeranda(container);
+    else if (page === 'materi') renderMateri(container);
+    else if (page === 'simulasi') renderSimulasi(container);
+    else if (page === 'eksplorasi') renderEksplorasi(container);
+    else if (page === 'evaluasi') renderEvaluasi(container);
+    else if (page === 'pencapaian') renderPencapaian(container);
+    else if (page === 'admin') {
+      renderAdmin(container);
+      window.switchAdminSoalTipe();
+    }
+
+    lucide.createIcons();
+    renderMath();
+    document.getElementById('mpi-app-root').scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // =========================================================================
+  // 1. BERANDA (5 URUTAN MENU BELAJAR BERJENJANG)
+  // =========================================================================
+  function renderBeranda(el) {
+    const p = state.progres;
+    const steps = [
+      {
+        num: '01',
+        key: 'materi',
+        title: 'Materi Pemahaman Konsep',
+        subtitle: '6 Sub-Materi & Simulasi Konsep Sederhana',
+        desc: 'Pelajari Jarak & Perpindahan, GLB, GLBB, GVA, GVB, dan GJB melalui ringkasan rumus serta simulasi visual.',
+        color: 'from-blue-600 to-sky-500',
+        badgeBg: 'bg-blue-100 text-blue-800',
+        icon: 'book-open',
+        done: p.materi_selesai,
+        unlocked: isStepUnlocked('materi')
+      },
+      {
+        num: '02',
+        key: 'simulasi',
+        title: 'Simulasi Keterampilan Proses Sains',
+        subtitle: 'Lab Virtual Lintasan Horizontal & Vertikal',
+        desc: 'Lakukan eksperimen variabel kecepatan, percepatan, dan gravitasi serta catat hasil pengamatanmu.',
+        color: 'from-orange-500 to-amber-500',
+        badgeBg: 'bg-orange-100 text-orange-800',
+        icon: 'flask-conical',
+        done: p.simulasi_selesai,
+        unlocked: isStepUnlocked('simulasi')
+      },
+      {
+        num: '03',
+        key: 'eksplorasi',
+        title: 'Eksplorasi',
+        subtitle: 'Misi Eksplorasi, Latihan & Refleksi',
+        desc: 'Uji hipotesis fisika, kerjakan latihan interaktif 6 sub-materi, dan tuliskan refleksi pembelajaran.',
+        color: 'from-violet-600 to-purple-500',
+        badgeBg: 'bg-violet-100 text-violet-800',
+        icon: 'compass',
+        done: p.eksplorasi_selesai,
+        unlocked: isStepUnlocked('eksplorasi')
+      },
+      {
+        num: '04',
+        key: 'evaluasi',
+        title: 'Evaluasi',
+        subtitle: 'Uji Kompetensi Akhir Multi-Tipe Soal',
+        desc: 'Kerjakan soal pilihan ganda, PG kompleks, benar/salah, menjodohkan, dan isian singkat.',
+        color: 'from-emerald-600 to-green-500',
+        badgeBg: 'bg-emerald-100 text-emerald-800',
+        icon: 'clipboard-check',
+        done: p.evaluasi_selesai,
+        unlocked: isStepUnlocked('evaluasi')
+      },
+      {
+        num: '05',
+        key: 'pencapaian',
+        title: 'Pencapaian',
+        subtitle: 'Lencana Kompetensi & Rapor Belajar',
+        desc: 'Lihat rekap ketuntasan seluruh tahapan belajar, koleksi lencana fisika, dan nilai evaluasi.',
+        color: 'from-teal-600 to-cyan-500',
+        badgeBg: 'bg-teal-100 text-teal-800',
+        icon: 'trophy',
+        done: p.evaluasi_selesai && p.skor_evaluasi >= 70,
+        unlocked: isStepUnlocked('pencapaian')
+      }
+    ];
+
+    const completedCount = steps.filter(s => s.done).length;
+    const percent = Math.round((completedCount / steps.length) * 100);
+
+    el.innerHTML = `
+      <div class="space-y-6">
+        <div class="glass-card rounded-3xl p-6 sm:p-7 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div>
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-xs font-extrabold mb-2">
+              <i data-lucide="map" class="w-3.5 h-3.5"></i> Alur Belajar Berurutan (Sequential Unlock)
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Halo, ${escapeHtml(state.currentUser?.nama || 'Siswa')}!</h2>
+            <p class="text-sm text-slate-600 mt-1 max-w-2xl">
+              Selesaikan tahapan belajar secara berurutan dari <strong>Urutan 01</strong> hingga <strong>Urutan 05</strong> untuk membuka setiap menu berikutnya.
+            </p>
+          </div>
+          <div class="w-full md:w-64 bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 shrink-0">
+            <div class="flex justify-between items-center text-xs font-extrabold text-sky-900 mb-1.5">
+              <span>Progres Ketuntasan</span>
+              <span>${percent}% (${completedCount}/5)</span>
+            </div>
+            <div class="w-full h-3 bg-sky-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500" style="width:${percent}%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          ${steps.map((st, idx) => `
+            <div onclick="window.navigate('${st.key}')" class="step-card ${st.unlocked ? '' : 'locked-card'} glass-card rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <span class="px-3 py-1 rounded-full text-xs font-extrabold ${st.badgeBg}">Urutan ${st.num}</span>
+                  ${st.done
+                    ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Selesai</span>`
+                    : st.unlocked
+                      ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-extrabold"><i data-lucide="unlock" class="w-3.5 h-3.5"></i> Terbuka</span>`
+                      : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-extrabold"><i data-lucide="lock" class="w-3.5 h-3.5"></i> Terkunci</span>`
+                  }
+                </div>
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br ${st.unlocked ? st.color : 'from-slate-400 to-slate-500'} text-white flex items-center justify-center shadow-md mb-4">
+                  <i data-lucide="${st.icon}" class="w-7 h-7"></i>
+                </div>
+                <h3 class="text-lg font-extrabold text-slate-900">${idx + 1}. ${st.title}</h3>
+                <p class="text-xs font-bold text-sky-700 mt-0.5">${st.subtitle}</p>
+                <p class="text-sm text-slate-600 mt-2.5 leading-relaxed">${st.desc}</p>
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-sky-100 flex items-center justify-between">
+                <span class="text-xs font-extrabold ${st.unlocked ? 'text-sky-700' : 'text-slate-400'}">
+                  ${st.unlocked ? 'Buka Menu Belajar' : 'Selesaikan tahap sebelumnya'}
+                </span>
+                <div class="w-8 h-8 rounded-full ${st.unlocked ? 'bg-amber-400 text-slate-900' : 'bg-slate-200 text-slate-400'} flex items-center justify-center shadow-sm">
+                  <i data-lucide="${st.unlocked ? 'arrow-right' : 'lock'}" class="w-4 h-4"></i>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // 2. MATERI PEMAHAMAN KONSEP (6 SUB-MATERI + SIMULASI SEDERHANA INTERAKTIF)
+  // =========================================================================
+  const SUB_MATERI_DATA = {
+    jarak: {
+      num: '01',
+      title: 'Perbedaan Jarak dan Perpindahan',
+      badge: 'Skalar vs Vektor',
+      summary: '<strong>Jarak ($s$)</strong> adalah panjang seluruh lintasan yang ditempuh benda tanpa memperhatikan arah (besaran skalar). Sedangkan <strong>Perpindahan ($\\Delta x$)</strong> adalah perubahan kedudukan benda diukur dari posisi awal ke posisi akhir beserta arahnya (besaran vektor).',
+      formulas: [
+        'Jarak Total: $s = s_1 + s_2 + \\dots$',
+        'Perpindahan 1D: $\\Delta x = x_{\\text{akhir}} - x_{\\text{awal}}$'
+      ],
+      points: [
+        'Kelajuan rata-rata = Jarak total dibagi selang waktu ($v = s / t$).',
+        'Kecepatan rata-rata = Perpindahan dibagi selang waktu ($\\vec{v} = \\Delta x / \\Delta t$).',
+        'Jika benda kembali ke titik awal, perpindahannya bernilai nol ($\\Delta x = 0$), meskipun jarak tempuhnya tidak nol.'
+      ],
+      simTitle: 'Simulasi Konsep: Jalan Maju & Berbalik Arah',
+      simDesc: 'Atur langkah ke Timur (+) lalu berbalik ke Barat (-) untuk membandingkan Jarak dan Perpindahan secara langsung.'
+    },
+    glb: {
+      num: '02',
+      title: 'Gerak Lurus Beraturan (GLB)',
+      badge: 'a = 0 • v = tetap',
+      summary: '<strong>Gerak Lurus Beraturan (GLB)</strong> adalah gerak benda pada lintasan lurus dengan <strong>kecepatan tetap (konstan)</strong> baik besar maupun arahnya, sehingga percepatan benda bernilai nol ($a = 0$).',
+      formulas: [
+        '$v = \\frac{s}{t} \\quad \\Longleftrightarrow \\quad s = v \\cdot t$',
+        'Posisi saat $t$: $x(t) = x_0 + v \\cdot t$'
+      ],
+      points: [
+        'Dalam selang waktu yang sama, benda selalu menempuh jarak yang sama.',
+        'Grafik $v - t$ berbentuk garis lurus mendatar sejajar sumbu waktu ($t$).',
+        'Grafik $s - t$ berbentuk garis lurus miring dengan kemiringan (gradien) menunjukkan kecepatan ($v$).'
+      ],
+      simTitle: 'Simulasi Konsep: Kecepatan Konstan GLB',
+      simDesc: 'Geser nilai kecepatan tetap ($v$) dan waktu tempuh ($t$) untuk mengamati pertambahan jarak yang linear.'
+    },
+    glbb: {
+      num: '03',
+      title: 'Gerak Lurus Berubah Beraturan (GLBB)',
+      badge: 'a = konstan',
+      summary: '<strong>Gerak Lurus Berubah Beraturan (GLBB)</strong> adalah gerak pada lintasan lurus dengan <strong>percepatan tetap ($a = \\text{konstan}$)</strong>. Jika percepatan searah kecepatan ($a > 0$) gerak dipercepat; jika berlawanan ($a < 0$) gerak diperlambat.',
+      formulas: [
+        '$v_t = v_0 \\pm a \\cdot t$',
+        '$s = v_0 \\cdot t \\pm \\frac{1}{2} a \\cdot t^2$',
+        '$v_t^2 = v_0^2 \\pm 2 \\cdot a \\cdot s$'
+      ],
+      points: [
+        'Grafik $v - t$ berupa garis lurus miring naik (dipercepat) atau turun (diperlambat).',
+        'Grafik $s - t$ berupa kurva parabola melengkung.',
+        'Luas daerah di bawah grafik $v - t$ sama dengan jarak tempuh ($s$) benda.'
+      ],
+      simTitle: 'Simulasi Konsep: Percepatan & Perlambatan GLBB',
+      simDesc: 'Uji pengaruh percepatan ($a$) positif maupun negatif terhadap kecepatan akhir ($v_t$) dan jarak tempuh ($s$).'
+    },
+    gva: {
+      num: '04',
+      title: 'Gerak Vertikal ke Atas (GVA)',
+      badge: 'v₀ > 0 • a = -g',
+      summary: '<strong>Gerak Vertikal ke Atas (GVA)</strong> merupakan GLBB diperlambat dengan kecepatan awal $v_0 > 0$ ke atas melawan percepatan gravitasi bumi ($a = -g$). Pada titik tertinggi, kecepatan sesaat benda bernilai nol ($v_t = 0$).',
+      formulas: [
+        '$v_t = v_0 - g \\cdot t$',
+        '$h = v_0 \\cdot t - \\frac{1}{2} g \\cdot t^2$',
+        'Tinggi Maksimum: $h_{\\text{maks}} = \\frac{v_0^2}{2g}$ &nbsp;|&nbsp; $t_{\\text{naik}} = \\frac{v_0}{g}$'
+      ],
+      points: [
+        'Waktu naik menuju puncak sama dengan waktu turun kembali ke titik pelemparan ($t_{\\text{naik}} = t_{\\text{turun}}$).',
+        'Saat kembali ke ketinggian pelemparan semula, kelajuan benda sama dengan $v_0$ dengan arah ke bawah.',
+        'Percepatan gravitasi $g \\approx 10\\text{ m/s}^2$ selalu bekerja ke bawah.'
+      ],
+      simTitle: 'Simulasi Konsep: Lemparan Bola Vertikal ke Atas',
+      simDesc: 'Atur kecepatan lempar awal ($v_0$) untuk menghitung tinggi maksimum ($h_{\\text{maks}}$) dan waktu naik bola.'
+    },
+    gvb: {
+      num: '05',
+      title: 'Gerak Vertikal ke Bawah (GVB)',
+      badge: 'v₀ > 0 • a = +g',
+      summary: '<strong>Gerak Vertikal ke Bawah (GVB)</strong> adalah gerak benda yang dilemparkan vertikal ke bawah dari ketinggian tertentu dengan <strong>kecepatan awal ($v_0 > 0$)</strong> searah percepatan gravitasi ($a = +g$).',
+      formulas: [
+        '$v_t = v_0 + g \\cdot t$',
+        '$h = v_0 \\cdot t + \\frac{1}{2} g \\cdot t^2$',
+        '$v_t^2 = v_0^2 + 2 \\cdot g \\cdot h$'
+      ],
+      points: [
+        'Termasuk GLBB dipercepat beraturan dengan percepatan sebesar $g$.',
+        'Semakin besar $v_0$ ke bawah, semakin singkat waktu yang diperlukan benda untuk mencapai tanah.',
+        'Berbeda dengan GJB yang dilepas tanpa kecepatan awal ($v_0 = 0$).'
+      ],
+      simTitle: 'Simulasi Konsep: Lemparan Vertikal ke Bawah',
+      simDesc: 'Bandingkan kecepatan saat menyentuh tanah ($v_t$) untuk variasi kecepatan lempar awal ($v_0$) dan tinggi menara ($h$).'
+    },
+    gjb: {
+      num: '06',
+      title: 'Gerak Jatuh Bebas (GJB)',
+      badge: 'v₀ = 0 • a = +g',
+      summary: '<strong>Gerak Jatuh Bebas (GJB)</strong> adalah gerak benda yang jatuh dari ketinggian $h$ <strong>tanpa kecepatan awal ($v_0 = 0$)</strong> dan hanya dipengaruhi oleh gaya gravitasi bumi ($a = +g$).',
+      formulas: [
+        '$v_t = g \\cdot t = \\sqrt{2 \\cdot g \\cdot h}$',
+        '$h = \\frac{1}{2} g \\cdot t^2$',
+        'Waktu jatuh: $t = \\sqrt{\\frac{2h}{g}}$'
+      ],
+      points: [
+        'Dalam ruang hampa (tanpa hambatan udara), benda berat dan benda ringan jatuh bersamaan karena waktu jatuh tidak bergantung pada massa benda.',
+        'Setiap detik kelajuan benda bertambah sebesar $g \\approx 10\\text{ m/s}$.',
+        'Merupakan kasus khusus dari GLBB dengan $v_0 = 0$ dan $a = g$.'
+      ],
+      simTitle: 'Simulasi Konsep: Benda Jatuh Bebas dari Ketinggian',
+      simDesc: 'Ubah ketinggian jatuh ($h$) untuk mengamati waktu jatuh ($t$) dan kelajuan tumbukan ($v_t$).'
+    }
+  };
+
+  function renderMateri(el) {
+    const tabs = [
+      { key: 'jarak', label: '1. Jarak & Perpindahan' },
+      { key: 'glb', label: '2. GLB' },
+      { key: 'glbb', label: '3. GLBB' },
+      { key: 'gva', label: '4. GVA' },
+      { key: 'gvb', label: '5. GVB' },
+      { key: 'gjb', label: '6. GJB' }
+    ];
+    const current = SUB_MATERI_DATA[state.materiTab] || SUB_MATERI_DATA.jarak;
+
+    el.innerHTML = `
+      <div class="space-y-5">
+        <div class="glass-card rounded-3xl p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-extrabold">Urutan 01 • Materi Pemahaman Konsep</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">6 Sub-Materi Gerak Lurus & Simulasi Konsep</h2>
+            </div>
+            <button onclick="window.markMateriDone()" class="px-4 py-2.5 rounded-xl ${state.progres.materi_selesai ? 'bg-emerald-600 text-white' : 'bg-amber-400 hover:bg-amber-500 text-slate-950'} font-extrabold text-xs shadow transition flex items-center gap-2">
+              <i data-lucide="${state.progres.materi_selesai ? 'check-circle' : 'unlock'}" class="w-4 h-4"></i>
+              <span>${state.progres.materi_selesai ? 'Materi Selesai • Lanjut Simulasi KPS' : 'Tandai Selesai & Buka Simulasi KPS'}</span>
+            </button>
+          </div>
+
+          <!-- 6 Sub-Material Selector Pills -->
+          <div class="flex flex-wrap gap-2 pb-4 border-b border-sky-100">
+            ${tabs.map(t => `
+              <button onclick="window.selectMateriTab('${t.key}')" class="px-3.5 py-2 rounded-xl text-xs font-extrabold transition ${state.materiTab === t.key ? 'bg-sky-700 text-white shadow' : 'bg-sky-50 text-sky-900 hover:bg-sky-100 border border-sky-200'}">
+                ${t.label}
+              </button>
+            `).join('')}
+          </div>
+
+          <!-- Active Sub-Material Content -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-5">
+            <div class="lg:col-span-6 space-y-4">
+              <div class="flex items-center justify-between gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-900 text-xs font-extrabold">Sub-Materi ${current.num}</span>
+                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-900 text-xs font-extrabold">${current.badge}</span>
+              </div>
+              <h3 class="text-xl font-extrabold text-slate-900">${current.title}</h3>
+              <p class="text-sm text-slate-700 leading-relaxed">${current.summary}</p>
+
+              <div class="formula-box rounded-2xl p-4 space-y-1.5">
+                <div class="text-[11px] font-extrabold uppercase tracking-wider text-blue-800">Persamaan Matematis</div>
+                ${current.formulas.map(f => `<div class="text-sm sm:text-base font-extrabold text-slate-900">${f}</div>`).join('')}
+              </div>
+
+              <div class="bg-white/80 rounded-2xl p-4 border border-sky-100">
+                <div class="text-xs font-extrabold text-slate-900 mb-2">Poin Penting Konsep:</div>
+                <ul class="text-xs text-slate-700 space-y-1.5 list-disc pl-4 font-medium">
+                  ${current.points.map(pt => `<li>${pt}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+
+            <!-- Interactive Concept Mini-Simulation (No YouTube) -->
+            <div class="lg:col-span-6 rounded-2xl bg-gradient-to-br from-sky-50 to-blue-50 border-2 border-sky-200 p-5 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center gap-2 text-sky-800 mb-1">
+                  <i data-lucide="sliders" class="w-4 h-4"></i>
+                  <span class="text-xs font-extrabold uppercase">Simulasi Konsep Interaktif</span>
+                </div>
+                <h4 class="text-base font-extrabold text-slate-900">${current.simTitle}</h4>
+                <p class="text-xs text-slate-600 mt-1">${current.simDesc}</p>
+              </div>
+
+              <div id="mini-sim-box" class="bg-white rounded-2xl p-4 border border-sky-200 shadow-sm space-y-3">
+                ${renderMiniSimHTML(state.materiTab)}
+              </div>
+
+              <div class="flex justify-between items-center pt-1">
+                <span class="text-[11px] font-bold text-slate-500">Geser slider untuk mengamati perubahan besaran fisika.</span>
+                <button onclick="window.nextSubMateri()" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold transition flex items-center gap-1">
+                  <span>Sub-Materi Berikutnya</span>
+                  <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    window.updateMiniSim(state.materiTab);
+  }
+
+  function renderMiniSimHTML(key) {
+    if (key === 'jarak') {
+      return `
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Langkah ke Timur (+):</span><span id="ms-east-lbl" class="text-blue-700">40 m</span></div>
+            <input id="ms-east" type="range" min="10" max="80" value="40" oninput="window.updateMiniSim('jarak')" class="w-full accent-blue-600" />
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Berbalik ke Barat (-):</span><span id="ms-west-lbl" class="text-rose-600">15 m</span></div>
+            <input id="ms-west" type="range" min="0" max="80" value="15" oninput="window.updateMiniSim('jarak')" class="w-full accent-rose-600" />
+          </div>
+          <div class="relative h-10 bg-slate-100 rounded-xl border border-slate-200 flex items-center px-3">
+            <div id="ms-jarak-bar" class="h-3 bg-blue-500 rounded-full transition-all" style="width:40%"></div>
+            <div id="ms-disp-dot" class="w-4 h-4 rounded-full bg-amber-500 border-2 border-slate-900 absolute transition-all" style="left:25%"></div>
+          </div>
+          <div id="ms-jarak-out" class="p-2.5 rounded-xl bg-sky-50 font-extrabold text-slate-800"></div>
+        </div>
+      `;
+    }
+    if (key === 'glb') {
+      return `
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Kecepatan Tetap ($v$):</span><span id="ms-glb-v-lbl" class="text-blue-700">15 m/s</span></div>
+            <input id="ms-glb-v" type="range" min="5" max="40" value="15" oninput="window.updateMiniSim('glb')" class="w-full accent-blue-600" />
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Waktu Tempuh ($t$):</span><span id="ms-glb-t-lbl" class="text-emerald-700">6 s</span></div>
+            <input id="ms-glb-t" type="range" min="1" max="15" value="6" oninput="window.updateMiniSim('glb')" class="w-full accent-emerald-600" />
+          </div>
+          <div class="h-8 bg-slate-700 rounded-xl relative flex items-center px-3 overflow-hidden">
+            <div id="ms-glb-car" class="w-7 h-4 rounded bg-amber-400 transition-all" style="margin-left:30%"></div>
+          </div>
+          <div id="ms-glb-out" class="p-2.5 rounded-xl bg-sky-50 font-extrabold text-slate-800"></div>
+        </div>
+      `;
+    }
+    if (key === 'glbb') {
+      return `
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Kecepatan Awal ($v_0$):</span><span id="ms-glbb-v0-lbl">10 m/s</span></div>
+            <input id="ms-glbb-v0" type="range" min="0" max="30" value="10" oninput="window.updateMiniSim('glbb')" class="w-full accent-sky-600" />
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Percepatan ($a$):</span><span id="ms-glbb-a-lbl">4 m/s²</span></div>
+            <input id="ms-glbb-a" type="range" min="-5" max="10" value="4" oninput="window.updateMiniSim('glbb')" class="w-full accent-orange-600" />
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Waktu ($t$):</span><span id="ms-glbb-t-lbl">4 s</span></div>
+            <input id="ms-glbb-t" type="range" min="1" max="10" value="4" oninput="window.updateMiniSim('glbb')" class="w-full accent-indigo-600" />
+          </div>
+          <div id="ms-glbb-out" class="p-2.5 rounded-xl bg-indigo-50 font-extrabold text-slate-800"></div>
+        </div>
+      `;
+    }
+    if (key === 'gva') {
+      return `
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Kecepatan Lempar Awal ($v_0$):</span><span id="ms-gva-v0-lbl" class="text-orange-700">20 m/s</span></div>
+            <input id="ms-gva-v0" type="range" min="10" max="50" step="5" value="20" oninput="window.updateMiniSim('gva')" class="w-full accent-orange-600" />
+          </div>
+          <div class="h-24 bg-sky-100 rounded-xl border border-sky-200 relative flex justify-center items-end p-2">
+            <div id="ms-gva-ball" class="w-5 h-5 rounded-full bg-orange-500 shadow transition-all" style="margin-bottom: 32px"></div>
+          </div>
+          <div id="ms-gva-out" class="p-2.5 rounded-xl bg-orange-50 font-extrabold text-slate-800"></div>
+        </div>
+      `;
+    }
+    if (key === 'gvb') {
+      return `
+        <div class="space-y-2.5 text-xs">
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Kecepatan Awal ke Bawah ($v_0$):</span><span id="ms-gvb-v0-lbl">10 m/s</span></div>
+            <input id="ms-gvb-v0" type="range" min="2" max="30" value="10" oninput="window.updateMiniSim('gvb')" class="w-full accent-amber-600" />
+          </div>
+          <div>
+            <div class="flex justify-between font-bold mb-1"><span>Ketinggian Menara ($h$):</span><span id="ms-gvb-h-lbl">40 m</span></div>
+            <input id="ms-gvb-h" type="range" min="10" max="100" step="5" value="40" oninput="window.updateMiniSim('gvb')" class="w-full accent-sky-600" />
+          </div>
+          <div id="ms-gvb-out" class="p-2.5 rounded-xl bg-amber-50 font-extrabold text-slate-800"></div>
+        </div>
+      `;
+    }
+    return `
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <div class="flex justify-between font-bold mb-1"><span>Ketinggian Jatuh Bebas ($h$):</span><span id="ms-gjb-h-lbl" class="text-emerald-700">45 m</span></div>
+          <input id="ms-gjb-h" type="range" min="5" max="125" step="5" value="45" oninput="window.updateMiniSim('gjb')" class="w-full accent-emerald-600" />
+        </div>
+        <div class="h-24 bg-emerald-50 rounded-xl border border-emerald-200 relative flex justify-center items-start p-2">
+          <div id="ms-gjb-ball" class="w-5 h-5 rounded-full bg-emerald-600 shadow transition-all" style="margin-top: 25px"></div>
+        </div>
+        <div id="ms-gjb-out" class="p-2.5 rounded-xl bg-emerald-50 font-extrabold text-slate-800"></div>
+      </div>
+    `;
+  }
+
+  window.updateMiniSim = (key) => {
+    const g = 10;
+    if (key === 'jarak') {
+      const east = parseFloat(document.getElementById('ms-east')?.value || 40);
+      const west = parseFloat(document.getElementById('ms-west')?.value || 15);
+      document.getElementById('ms-east-lbl').textContent = `${east} m`;
+      document.getElementById('ms-west-lbl').textContent = `${west} m`;
+      const jarak = east + west;
+      const disp = east - west;
+      document.getElementById('ms-jarak-bar').style.width = `${Math.min(95, (east / 80) * 90)}%`;
+      document.getElementById('ms-disp-dot').style.left = `${Math.max(4, Math.min(90, ((disp + 80) / 160) * 90))}%`;
+      document.getElementById('ms-jarak-out').innerHTML = `Jarak Total = <span class="text-blue-700">${jarak} m</span> &nbsp;|&nbsp; Perpindahan = <span class="text-amber-700">${Math.abs(disp)} m (${disp >= 0 ? 'Timur' : 'Barat'})</span>`;
+    } else if (key === 'glb') {
+      const v = parseFloat(document.getElementById('ms-glb-v')?.value || 15);
+      const t = parseFloat(document.getElementById('ms-glb-t')?.value || 6);
+      const s = v * t;
+      document.getElementById('ms-glb-v-lbl').textContent = `${v} m/s`;
+      document.getElementById('ms-glb-t-lbl').textContent = `${t} s`;
+      document.getElementById('ms-glb-car').style.marginLeft = `${Math.min(85, (s / 600) * 85)}%`;
+      document.getElementById('ms-glb-out').innerHTML = `Jarak Tempuh ($s = v \\cdot t$) = <span class="text-blue-700">${s} meter</span>`;
+    } else if (key === 'glbb') {
+      const v0 = parseFloat(document.getElementById('ms-glbb-v0')?.value || 10);
+      const a = parseFloat(document.getElementById('ms-glbb-a')?.value || 4);
+      const t = parseFloat(document.getElementById('ms-glbb-t')?.value || 4);
+      const vt = v0 + a * t;
+      const s = v0 * t + 0.5 * a * t * t;
+      document.getElementById('ms-glbb-v0-lbl').textContent = `${v0} m/s`;
+      document.getElementById('ms-glbb-a-lbl').textContent = `${a} m/s²`;
+      document.getElementById('ms-glbb-t-lbl').textContent = `${t} s`;
+      document.getElementById('ms-glbb-out').innerHTML = `Kecepatan Akhir ($v_t$) = <span class="text-indigo-700">${vt} m/s</span> &nbsp;|&nbsp; Jarak ($s$) = <span class="text-emerald-700">${s} m</span>`;
+    } else if (key === 'gva') {
+      const v0 = parseFloat(document.getElementById('ms-gva-v0')?.value || 20);
+      const hmaks = (v0 * v0) / (2 * g);
+      const tnaik = v0 / g;
+      document.getElementById('ms-gva-v0-lbl').textContent = `${v0} m/s`;
+      document.getElementById('ms-gva-ball').style.marginBottom = `${Math.min(62, (hmaks / 125) * 62)}px`;
+      document.getElementById('ms-gva-out').innerHTML = `Tinggi Maks ($h_{\\text{maks}}$) = <span class="text-orange-700">${hmaks.toFixed(1)} m</span> &nbsp;|&nbsp; Waktu Naik ($t$) = <span class="text-sky-700">${tnaik.toFixed(1)} s</span>`;
+    } else if (key === 'gvb') {
+      const v0 = parseFloat(document.getElementById('ms-gvb-v0')?.value || 10);
+      const h = parseFloat(document.getElementById('ms-gvb-h')?.value || 40);
+      const vt = Math.sqrt(v0 * v0 + 2 * g * h);
+      const t = (vt - v0) / g;
+      document.getElementById('ms-gvb-v0-lbl').textContent = `${v0} m/s`;
+      document.getElementById('ms-gvb-h-lbl').textContent = `${h} m`;
+      document.getElementById('ms-gvb-out').innerHTML = `Kecepatan Tumbuk ($v_t$) = <span class="text-amber-800">${vt.toFixed(1)} m/s</span> &nbsp;|&nbsp; Waktu = <span class="text-sky-700">${t.toFixed(2)} s</span>`;
+    } else if (key === 'gjb') {
+      const h = parseFloat(document.getElementById('ms-gjb-h')?.value || 45);
+      const t = Math.sqrt((2 * h) / g);
+      const vt = g * t;
+      document.getElementById('ms-gjb-h-lbl').textContent = `${h} m`;
+      document.getElementById('ms-gjb-ball').style.marginTop = `${Math.min(60, (h / 125) * 60)}px`;
+      document.getElementById('ms-gjb-out').innerHTML = `Waktu Jatuh ($t$) = <span class="text-emerald-700">${t.toFixed(2)} s</span> &nbsp;|&nbsp; Kelajuan Akhir ($v_t$) = <span class="text-blue-700">${vt.toFixed(1)} m/s</span>`;
+    }
+    renderMath();
+  };
+
+  window.selectMateriTab = (key) => {
+    state.materiTab = key;
+    renderMateri(document.getElementById('view-container'));
+    lucide.createIcons();
+    renderMath();
+  };
+
+  window.nextSubMateri = () => {
+    const order = ['jarak', 'glb', 'glbb', 'gva', 'gvb', 'gjb'];
+    const idx = order.indexOf(state.materiTab);
+    if (idx < order.length - 1) {
+      window.selectMateriTab(order[idx + 1]);
+    } else {
+      window.markMateriDone();
+    }
+  };
+
+  window.markMateriDone = async () => {
+    await syncProgres({ materi_selesai: true });
+    updateNavigationLockUI();
+    showToast('Materi selesai! Menu Simulasi KPS kini terbuka.', 'success');
+    window.navigate('simulasi');
+  };
+
+  // =========================================================================
+  // 3. SIMULASI KETERAMPILAN PROSES SAINS (HORIZONTAL & VERTIKAL)
+  // =========================================================================
+  let simTimer = null;
+  const simState = {
+    domain: 'horizontal',
+    subType: 'GLB',
+    v0: 20,
+    a: 4,
+    h0: 60,
+    speedMult: 1,
+    t: 0,
+    pos: 0,
+    v: 20,
+    running: false,
+    history: []
+  };
+
+  function stopSimLoop() {
+    if (simTimer) {
+      clearInterval(simTimer);
+      simTimer = null;
+    }
+    simState.running = false;
+  }
+
+  function renderSimulasi(el) {
+    el.innerHTML = `
+      <div class="space-y-5">
+        <div class="glass-card rounded-3xl p-5 sm:p-6">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-xs font-extrabold">Urutan 02 • Laboratorium Virtual</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 mt-1">Simulasi Keterampilan Proses Sains (KPS)</h2>
+            </div>
+            <button onclick="window.completeSimulasi()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow transition flex items-center gap-1.5">
+              <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              <span>Selesai Praktikum & Buka Eksplorasi</span>
+            </button>
+          </div>
+
+          <!-- Domain Selector -->
+          <div class="grid grid-cols-2 gap-2 p-1.5 bg-sky-100 rounded-2xl mb-4 max-w-md">
+            <button onclick="window.setSimDomain('horizontal')" class="py-2 rounded-xl text-xs font-extrabold transition ${simState.domain === 'horizontal' ? 'bg-white text-sky-900 shadow' : 'text-slate-600'}">
+              Lintasan Horizontal (GLB / GLBB)
+            </button>
+            <button onclick="window.setSimDomain('vertikal')" class="py-2 rounded-xl text-xs font-extrabold transition ${simState.domain === 'vertikal' ? 'bg-white text-orange-700 shadow' : 'text-slate-600'}">
+              Lintasan Vertikal (GVA / GVB / GJB)
+            </button>
+          </div>
+
+          <!-- Parameter Controls -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-sky-50/90 border-2 border-sky-200 rounded-2xl p-4 mb-4">
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 mb-1">Jenis Gerak</label>
+              <select id="kps-subtype" onchange="window.updateKpsParams()" class="w-full px-3.5 py-2.5 rounded-xl bg-white border-2 border-sky-300 text-xs font-extrabold text-sky-900">
+                ${simState.domain === 'horizontal' ? `
+                  <option value="GLB" ${simState.subType === 'GLB' ? 'selected' : ''}>GLB (Kecepatan Konstan)</option>
+                  <option value="GLBB" ${simState.subType === 'GLBB' ? 'selected' : ''}>GLBB (Percepatan Konstan)</option>
+                ` : `
+                  <option value="GVA" ${simState.subType === 'GVA' ? 'selected' : ''}>Gerak Vertikal ke Atas (GVA)</option>
+                  <option value="GVB" ${simState.subType === 'GVB' ? 'selected' : ''}>Gerak Vertikal ke Bawah (GVB)</option>
+                  <option value="GJB" ${simState.subType === 'GJB' ? 'selected' : ''}>Gerak Jatuh Bebas (GJB)</option>
+                `}
+              </select>
+            </div>
+
+            <div class="${simState.subType === 'GJB' ? 'opacity-40 pointer-events-none' : ''}">
+              <div class="flex justify-between text-xs font-extrabold text-slate-700 mb-1">
+                <span>Kecepatan Awal ($v_0$)</span>
+                <span id="kps-v0-lbl" class="px-2 py-0.5 rounded bg-sky-600 text-white">${simState.subType === 'GJB' ? 0 : simState.v0} m/s</span>
+              </div>
+              <input id="kps-v0" type="range" min="0" max="40" step="2" value="${simState.subType === 'GJB' ? 0 : simState.v0}" oninput="window.updateKpsParams()" class="w-full accent-sky-600" />
+            </div>
+
+            <div>
+              ${simState.domain === 'horizontal' ? `
+                <div class="${simState.subType === 'GLB' ? 'opacity-40 pointer-events-none' : ''}">
+                  <div class="flex justify-between text-xs font-extrabold text-slate-700 mb-1">
+                    <span>Percepatan ($a$)</span>
+                    <span id="kps-a-lbl" class="px-2 py-0.5 rounded bg-orange-600 text-white">${simState.subType === 'GLB' ? 0 : simState.a} m/s²</span>
+                  </div>
+                  <input id="kps-a" type="range" min="-6" max="10" step="1" value="${simState.a}" oninput="window.updateKpsParams()" class="w-full accent-orange-600" />
+                </div>
+              ` : `
+                <div class="${simState.subType === 'GVA' ? 'opacity-40 pointer-events-none' : ''}">
+                  <div class="flex justify-between text-xs font-extrabold text-slate-700 mb-1">
+                    <span>Ketinggian Awal ($h_0$)</span>
+                    <span id="kps-h0-lbl" class="px-2 py-0.5 rounded bg-emerald-600 text-white">${simState.subType === 'GVA' ? 0 : simState.h0} m</span>
+                  </div>
+                  <input id="kps-h0" type="range" min="10" max="100" step="5" value="${simState.h0}" oninput="window.updateKpsParams()" class="w-full accent-emerald-600" />
+                </div>
+              `}
+            </div>
+          </div>
+
+          <!-- Simulation Stage -->
+          <div class="rounded-2xl overflow-hidden border-2 border-sky-300 bg-gradient-to-b from-sky-300 via-sky-100 to-emerald-500 p-4">
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+              <div class="bg-white/95 px-4 py-2 rounded-xl border border-sky-200 text-xs font-extrabold text-slate-800 flex flex-wrap gap-4">
+                <span>Waktu ($t$): <strong id="kps-read-t" class="text-orange-600">0.00 s</strong></span>
+                <span>${simState.domain === 'horizontal' ? 'Jarak ($s$)' : 'Ketinggian ($h$)'}: <strong id="kps-read-pos" class="text-blue-700">0.0 m</strong></span>
+                <span>Kecepatan ($v$): <strong id="kps-read-v" class="text-emerald-700">0.0 m/s</strong></span>
+              </div>
+              <button onclick="window.recordKpsData()" class="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 text-xs font-extrabold shadow flex items-center gap-1.5">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i> Catat ke Tabel Pengamatan
+              </button>
+            </div>
+
+            ${simState.domain === 'horizontal' ? `
+              <div class="relative h-28 bg-slate-700 rounded-xl border-y-4 border-slate-400 flex items-center px-4 overflow-hidden">
+                <div class="absolute inset-x-0 top-1/2 -translate-y-1/2 border-t-4 border-dashed border-amber-300/80"></div>
+                <div id="kps-sprite" class="relative z-20 flex flex-col items-center" style="left:0%">
+                  <div class="w-16 h-8 rounded-lg bg-rose-500 border-2 border-white shadow flex items-center justify-center text-[10px] font-extrabold text-white">MOBIL</div>
+                </div>
+              </div>
+              <div class="flex justify-between text-[11px] font-extrabold text-white mt-1.5 px-2">
+                <span>0 m</span><span>25 m</span><span>50 m</span><span>75 m</span><span>100 m</span>
+              </div>
+            ` : `
+              <div class="relative h-56 bg-sky-200/70 rounded-xl border-2 border-white flex justify-center items-end overflow-hidden">
+                <div class="absolute left-3 inset-y-2 flex flex-col justify-between text-[10px] font-extrabold text-slate-700">
+                  <span>100 m</span><span>50 m</span><span>0 m (Tanah)</span>
+                </div>
+                <div id="kps-v-ball" class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-red-600 border-2 border-white shadow-lg flex items-center justify-center text-[10px] font-extrabold text-white absolute" style="bottom: 0%">
+                  Bola
+                </div>
+              </div>
+            `}
+          </div>
+
+          <!-- Playback Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-3 mt-4">
+            <div class="flex items-center gap-2">
+              <button onclick="window.startKpsSim()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow flex items-center gap-1.5">
+                <i data-lucide="play" class="w-4 h-4"></i> Mulai Simulasi
+              </button>
+              <button onclick="window.pauseSim()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow flex items-center gap-1.5">
+                <i data-lucide="pause" class="w-4 h-4"></i> Jeda
+              </button>
+              <button onclick="window.resetKpsSim()" class="px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-extrabold text-xs shadow flex items-center gap-1.5">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
+              </button>
+            </div>
+            <span class="text-xs font-bold text-slate-500">Percepatan gravitasi $g = 10\\text{ m/s}^2$</span>
+          </div>
+        </div>
+
+        <!-- KPS Observation Table -->
+        <div class="glass-card rounded-3xl p-5 sm:p-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-base font-extrabold text-slate-900">Tabel Pengamatan Keterampilan Proses Sains (KPS)</h3>
+            <button onclick="window.clearKpsLogs()" class="text-xs font-bold text-rose-600 hover:underline">Bersihkan Tabel</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-sky-100 text-sky-900 font-extrabold">
+                <tr>
+                  <th class="p-2.5">No</th>
+                  <th class="p-2.5">Jenis Gerak</th>
+                  <th class="p-2.5">Waktu ($t$)</th>
+                  <th class="p-2.5">Posisi / Ketinggian</th>
+                  <th class="p-2.5">Kecepatan ($v$)</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-sky-100 bg-white">
+                ${state.kpsLogs.length ? state.kpsLogs.map((row, idx) => `
+                  <tr>
+                    <td class="p-2.5 font-bold">${idx + 1}</td>
+                    <td class="p-2.5 font-extrabold text-sky-800">${escapeHtml(row.jenis)}</td>
+                    <td class="p-2.5">${row.t} s</td>
+                    <td class="p-2.5">${row.pos} m</td>
+                    <td class="p-2.5">${row.v} m/s</td>
+                  </tr>
+                `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-500">Jalankan simulasi lalu klik "Catat ke Tabel Pengamatan".</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    window.resetKpsSim();
+  }
+
+  window.setSimDomain = (domain) => {
+    simState.domain = domain;
+    simState.subType = domain === 'horizontal' ? 'GLB' : 'GVA';
+    renderSimulasi(document.getElementById('view-container'));
+    lucide.createIcons();
+    renderMath();
+  };
+
+  window.updateKpsParams = () => {
+    const sub = document.getElementById('kps-subtype')?.value || 'GLB';
+    simState.subType = sub;
+    if (sub === 'GJB') {
+      simState.v0 = 0;
+    } else {
+      const v0El = document.getElementById('kps-v0');
+      if (v0El) simState.v0 = parseFloat(v0El.value);
+    }
+    const aEl = document.getElementById('kps-a');
+    if (aEl) simState.a = sub === 'GLB' ? 0 : parseFloat(aEl.value);
+    const h0El = document.getElementById('kps-h0');
+    if (h0El) simState.h0 = sub === 'GVA' ? 0 : parseFloat(h0El.value);
+
+    renderSimulasi(document.getElementById('view-container'));
+    lucide.createIcons();
+    renderMath();
+  };
+
+  window.resetKpsSim = () => {
+    stopSimLoop();
+    simState.t = 0;
+    if (simState.domain === 'horizontal') {
+      simState.pos = 0;
+      simState.v = simState.v0;
+    } else {
+      if (simState.subType === 'GVA') {
+        simState.pos = 0;
+        simState.v = simState.v0;
+      } else if (simState.subType === 'GVB') {
+        simState.pos = simState.h0;
+        simState.v = simState.v0;
+      } else {
+        simState.pos = simState.h0;
+        simState.v = 0;
+      }
+    }
+    updateKpsDOM();
+  };
+
+  window.startKpsSim = () => {
+    if (simState.running) return;
+    simState.running = true;
+    const dt = 0.05;
+    const g = 10;
+
+    simTimer = setInterval(() => {
+      simState.t += dt;
+      if (simState.domain === 'horizontal') {
+        const a = simState.subType === 'GLB' ? 0 : simState.a;
+        let vNow = simState.v0 + a * simState.t;
+        if (vNow < 0) {
+          vNow = 0;
+          stopSimLoop();
+        }
+        let sNow = simState.v0 * simState.t + 0.5 * a * simState.t * simState.t;
+        if (sNow >= 100) {
+          sNow = 100;
+          stopSimLoop();
+        }
+        simState.v = vNow;
+        simState.pos = Math.max(0, sNow);
+      } else {
+        if (simState.subType === 'GVA') {
+          const hNow = simState.v0 * simState.t - 0.5 * g * simState.t * simState.t;
+          const vNow = simState.v0 - g * simState.t;
+          if (hNow <= 0 && simState.t > 0.1) {
+            simState.pos = 0;
+            simState.v = -simState.v0;
+            stopSimLoop();
+          } else {
+            simState.pos = Math.max(0, hNow);
+            simState.v = vNow;
+          }
+        } else {
+          const v0 = simState.subType === 'GJB' ? 0 : simState.v0;
+          const hNow = simState.h0 - (v0 * simState.t + 0.5 * g * simState.t * simState.t);
+          const vNow = v0 + g * simState.t;
+          if (hNow <= 0) {
+            simState.pos = 0;
+            simState.v = vNow;
+            stopSimLoop();
+          } else {
+            simState.pos = hNow;
+            simState.v = vNow;
+          }
+        }
+      }
+      updateKpsDOM();
+    }, 50);
+  };
+
+  function updateKpsDOM() {
+    const tEl = document.getElementById('kps-read-t');
+    const pEl = document.getElementById('kps-read-pos');
+    const vEl = document.getElementById('kps-read-v');
+    if (!tEl) return;
+
+    tEl.textContent = `${simState.t.toFixed(2)} s`;
+    pEl.textContent = `${simState.pos.toFixed(1)} m`;
+    vEl.textContent = `${simState.v.toFixed(1)} m/s`;
+
+    const car = document.getElementById('kps-sprite');
+    if (car) {
+      car.style.left = `${Math.min(86, (simState.pos / 100) * 86)}%`;
+    }
+    const ball = document.getElementById('kps-v-ball');
+    if (ball) {
+      ball.style.bottom = `${Math.max(0, Math.min(82, (simState.pos / 100) * 82))}%`;
+    }
+  }
+
+  window.recordKpsData = () => {
+    state.kpsLogs.push({
+      jenis: simState.subType,
+      t: simState.t.toFixed(2),
+      pos: simState.pos.toFixed(1),
+      v: simState.v.toFixed(1)
+    });
+    renderSimulasi(document.getElementById('view-container'));
+    lucide.createIcons();
+    renderMath();
+    showToast('Data pengamatan tercatat ke tabel KPS.', 'success');
+  };
+
+  window.clearKpsLogs = () => {
+    state.kpsLogs = [];
+    renderSimulasi(document.getElementById('view-container'));
+    lucide.createIcons();
+    renderMath();
+  };
+
+  window.completeSimulasi = async () => {
+    await syncProgres({ simulasi_selesai: true });
+    updateNavigationLockUI();
+    showToast('Simulasi KPS selesai! Menu Eksplorasi kini terbuka.', 'success');
+    window.navigate('eksplorasi');
+  };
+
+  // =========================================================================
+  // 4. EKSPLORASI (MISI KONSEP, LATIHAN INTERAKTIF & REFLEKSI)
+  // =========================================================================
+  function renderEksplorasi(el) {
+    el.innerHTML = `
+      <div class="space-y-6">
+        <div class="glass-card rounded-3xl p-6">
+          <span class="px-3 py-1 rounded-full bg-violet-100 text-violet-800 text-xs font-extrabold">Urutan 03 • Eksplorasi & Refleksi</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Eksplorasi Konsep, Latihan & Jurnal Refleksi</h2>
+
+          <div class="mt-4 rounded-2xl bg-amber-50 border-2 border-amber-300 p-5">
+            <h3 class="text-base font-extrabold text-amber-950">Misi Eksplorasi: Menentukan Ketinggian Menara (GJB)</h3>
+            <p class="text-sm text-slate-700 mt-1">
+              Sebuah batu dijatuhkan bebas ($v_0 = 0$) dari puncak menara dan menyentuh tanah tepat dalam waktu <strong>4 sekon</strong> ($g = 10\\text{ m/s}^2$). Berapakah tinggi menara tersebut ($h$)?
+            </p>
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+              <input id="exp-input-h" type="number" placeholder="Tinggi menara (meter)" class="px-4 py-2.5 rounded-xl bg-white border-2 border-amber-400 text-sm font-bold w-56" />
+              <button onclick="window.checkExplorationMission()" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-sm shadow">
+                Cek Jawaban Misi
+              </button>
+            </div>
+            <div id="exp-mission-fb" class="hidden mt-3 p-3 rounded-xl text-xs font-bold"></div>
+          </div>
+        </div>
+
+        <!-- Latihan Interaktif -->
+        <div class="glass-card rounded-3xl p-6 space-y-4">
+          <h3 class="text-lg font-extrabold text-slate-900">Latihan Pemahaman Konsep</h3>
+
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200">
+            <p class="text-sm font-bold text-slate-900">1. Seorang pelari mengelilingi lapangan lintasan melingkar sejauh 400 m dan kembali tepat ke garis start. Perpindahan pelari tersebut adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+              <button onclick="window.answerLatihan(1, true, this)" class="lat-1 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">A. 0 meter</button>
+              <button onclick="window.answerLatihan(1, false, this)" class="lat-1 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">B. 200 meter</button>
+              <button onclick="window.answerLatihan(1, false, this)" class="lat-1 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">C. 400 meter</button>
+              <button onclick="window.answerLatihan(1, false, this)" class="lat-1 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">D. 800 meter</button>
+            </div>
+            <div id="lat-fb-1" class="hidden mt-2 text-xs font-extrabold"></div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200">
+            <p class="text-sm font-bold text-slate-900">2. Bola dilempar vertikal ke atas dengan kecepatan awal 30 m/s ($g = 10\\text{ m/s}^2$). Waktu yang diperlukan bola untuk mencapai titik tertinggi adalah...</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+              <button onclick="window.answerLatihan(2, false, this)" class="lat-2 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">A. 1,5 sekon</button>
+              <button onclick="window.answerLatihan(2, true, this)" class="lat-2 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">B. 3,0 sekon</button>
+              <button onclick="window.answerLatihan(2, false, this)" class="lat-2 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">C. 4,5 sekon</button>
+              <button onclick="window.answerLatihan(2, false, this)" class="lat-2 p-3 rounded-xl bg-white border-2 border-sky-200 text-left text-xs font-bold">D. 6,0 sekon</button>
+            </div>
+            <div id="lat-fb-2" class="hidden mt-2 text-xs font-extrabold"></div>
+          </div>
+        </div>
+
+        <!-- Refleksi Pembelajaran -->
+        <div class="glass-card rounded-3xl p-6">
+          <h3 class="text-lg font-extrabold text-slate-900 mb-3">Refleksi Pembelajaran Siswa</h3>
+          <form onsubmit="window.submitRefleksi(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 mb-1">1. Jelaskan pemahaman inti yang kamu peroleh hari ini tentang Gerak Lurus!</label>
+              <textarea id="ref-inti" rows="2" required placeholder="Tulis kesimpulan belajarmu..." class="w-full p-3.5 rounded-xl bg-white border-2 border-sky-200 text-sm"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 mb-1">2. Sub-materi mana yang masih perlu pendalaman?</label>
+              <input id="ref-sulit" type="text" required placeholder="Contoh: Perbedaan persamaan GVA dan GVB" class="w-full p-3.5 rounded-xl bg-white border-2 border-sky-200 text-sm" />
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-slate-700">Skala Pemahaman (1–5):</span>
+                <select id="ref-skala" class="px-3 py-2 rounded-xl bg-white border-2 border-sky-200 text-xs font-extrabold">
+                  <option value="5">5 - Sangat Paham</option>
+                  <option value="4" selected>4 - Paham</option>
+                  <option value="3">3 - Cukup Paham</option>
+                  <option value="2">2 - Kurang Paham</option>
+                  <option value="1">1 - Perlu Bimbingan</option>
+                </select>
+              </div>
+              <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-sky-700 text-white font-extrabold text-sm shadow">
+                Simpan Refleksi & Buka Evaluasi
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+  }
+
+  window.checkExplorationMission = () => {
+    const val = parseFloat(document.getElementById('exp-input-h').value);
+    const fb = document.getElementById('exp-mission-fb');
+    fb.classList.remove('hidden');
+    if (val === 80) {
+      fb.className = 'mt-3 p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300';
+      fb.textContent = 'Benar! h = ½ · g · t² = ½ · 10 · (4)² = 5 × 16 = 80 meter.';
+    } else {
+      fb.className = 'mt-3 p-3 rounded-xl text-xs font-bold bg-rose-100 text-rose-900 border border-rose-300';
+      fb.textContent = 'Belum tepat. Gunakan rumus GJB: h = ½ · g · t² dengan g = 10 m/s² dan t = 4 s.';
+    }
+  };
+
+  let latFlags = { 1: false, 2: false };
+  window.answerLatihan = async (no, ok, btn) => {
+    document.querySelectorAll(`.lat-${no}`).forEach(b => b.classList.remove('bg-emerald-100', 'border-emerald-500', 'bg-rose-100', 'border-rose-500'));
+    const fb = document.getElementById(`lat-fb-${no}`);
+    fb.classList.remove('hidden');
+    if (ok) {
+      btn.classList.add('bg-emerald-100', 'border-emerald-500');
+      fb.className = 'mt-2 text-xs font-extrabold text-emerald-700';
+      fb.textContent = no === 1 ? 'Tepat! Posisi akhir sama dengan posisi awal sehingga perpindahan = 0 m.' : 'Tepat! t_naik = v₀ / g = 30 / 10 = 3,0 sekon.';
+      latFlags[no] = true;
+    } else {
+      btn.classList.add('bg-rose-100', 'border-rose-500');
+      fb.className = 'mt-2 text-xs font-extrabold text-rose-700';
+      fb.textContent = 'Belum tepat, periksa kembali konsepnya.';
+    }
+    const skor = (latFlags[1] ? 50 : 0) + (latFlags[2] ? 50 : 0);
+    await syncProgres({ skor_latihan: Math.max(state.progres.skor_latihan, skor) });
+  };
+
+  window.submitRefleksi = async (e) => {
+    e.preventDefault();
+    const record = {
+      guru_id: state.currentUser?.guru_id || null,
+      siswa_id: state.currentUser?.id || 'guest',
+      pemahaman_inti: document.getElementById('ref-inti').value.trim(),
+      bagian_sulit: document.getElementById('ref-sulit').value.trim(),
+      tingkat_paham: parseInt(document.getElementById('ref-skala').value, 10)
+    };
+    if (IS_PREVIEW) {
+      state.refleksiList.unshift({ ...record, id: 'r-' + Date.now(), nama_siswa: state.currentUser?.nama || 'Siswa Tamu', created_at: new Date().toISOString() });
+    } else if (supabase && state.currentUser?.role === 'siswa') {
+      await supabase.from('refleksi_siswa').insert([record]);
+    }
+    await syncProgres({ eksplorasi_selesai: true });
+    updateNavigationLockUI();
+    showToast('Refleksi tersimpan! Menu Evaluasi kini terbuka.', 'success');
+    window.navigate('evaluasi');
+  };
+
+  // =========================================================================
+  // 5. EVALUASI & PENCAPAIAN (TERISOLASI PER GURU)
+  // =========================================================================
+  let evalAnswers = {};
+
+  function getScopedBankSoal() {
+    if (!state.currentUser || state.currentUser.role === 'guest') {
+      return state.bankSoal.filter(s => !s.guru_id || s.guru_id === 'admin-preview');
+    }
+    if (state.currentUser.role === 'admin') {
+      return state.bankSoal.filter(s => s.guru_id === state.currentUser.id);
+    }
+    // Akun siswa hanya menerima soal milik guru pembimbingnya
+    if (state.currentUser.guru_id) {
+      return state.bankSoal.filter(s => s.guru_id === state.currentUser.guru_id);
+    }
+    return state.bankSoal.filter(s => !s.guru_id);
+  }
+
+  function getTipeSoalBadge(tipe) {
+    const map = {
+      pg: { label: 'Pilihan Ganda (A–E)', cls: 'bg-sky-100 text-sky-900' },
+      pg_kompleks: { label: 'PG Kompleks (Pilih >1)', cls: 'bg-violet-100 text-violet-900' },
+      benar_salah: { label: 'Benar / Salah', cls: 'bg-indigo-100 text-indigo-900' },
+      menjodohkan: { label: 'Menjodohkan', cls: 'bg-orange-100 text-orange-900' },
+      isian_singkat: { label: 'Isian Singkat', cls: 'bg-teal-100 text-teal-900' }
+    };
+    return map[tipe || 'pg'] || map.pg;
+  }
+
+  function renderEvaluasi(el) {
+    evalAnswers = {};
+    const soalList = getScopedBankSoal();
+
+    if (!soalList.length) {
+      el.innerHTML = `
+        <div class="glass-card rounded-3xl p-8 text-center">
+          <i data-lucide="inbox" class="w-12 h-12 text-sky-400 mx-auto mb-3"></i>
+          <h3 class="text-lg font-extrabold text-slate-900">Belum Ada Soal Evaluasi dari Guru Anda</h3>
+          <p class="text-sm text-slate-600 mt-1">Guru Anda belum menambahkan butir soal evaluasi untuk kelas ini.</p>
+        </div>
+      `;
+      return;
+    }
+
+    el.innerHTML = `
+      <div class="glass-card rounded-3xl p-6 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-extrabold">Urutan 04 • Evaluasi Akhir</span>
+            <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Evaluasi Penguasaan Konsep Gerak Lurus</h2>
+          </div>
+          <span class="px-4 py-2 rounded-2xl bg-sky-100 text-sky-900 text-xs font-extrabold">Jumlah Soal Kelas Anda: ${soalList.length} Butir</span>
+        </div>
+
+        <div class="space-y-4">
+          ${soalList.map((s, idx) => {
+            const tipe = s.tipe_soal || 'pg';
+            const badge = getTipeSoalBadge(tipe);
+            return `
+              <div class="p-5 rounded-2xl bg-white border-2 border-sky-100 shadow-sm">
+                <div class="flex flex-wrap items-center gap-2 mb-2.5">
+                  <span class="px-2.5 py-0.5 rounded-lg bg-sky-700 text-white text-xs font-extrabold">Soal ${idx + 1}</span>
+                  <span class="px-2.5 py-0.5 rounded-lg bg-amber-100 text-amber-900 text-xs font-bold">${escapeHtml(s.kategori)}</span>
+                  <span class="px-2.5 py-0.5 rounded-lg ${badge.cls} text-xs font-extrabold">${badge.label}</span>
+                </div>
+                <p class="text-sm sm:text-base font-bold text-slate-900">${escapeHtml(s.pertanyaan)}</p>
+                <div class="mt-3">
+                  ${renderSoalInputHTML(s, tipe)}
+                </div>
+                <div id="eval-disc-${s.id}" class="hidden mt-3 p-3 rounded-xl text-xs"></div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+          <div id="eval-score-box" class="hidden px-4 py-3 rounded-2xl font-extrabold text-sm"></div>
+          <button onclick="window.submitEvaluasi()" class="ml-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-extrabold text-sm shadow-lg flex items-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Kumpulkan & Hitung Nilai</span>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSoalInputHTML(s, tipe) {
+    if (tipe === 'pg') {
+      const opts = ['A', 'B', 'C', 'D', 'E'].filter(opt => (s['opsi_' + opt.toLowerCase()] || '').trim() !== '');
+      return `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          ${opts.map(opt => `
+            <button type="button" onclick="window.pilihEval('${s.id}', '${opt}', this)" class="eval-opt-${s.id} p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-sky-400 text-left text-xs sm:text-sm font-semibold transition flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-white border border-slate-300 flex items-center justify-center font-extrabold text-xs shrink-0">${opt}</span>
+              <span>${escapeHtml(s['opsi_' + opt.toLowerCase()])}</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (tipe === 'pg_kompleks') {
+      const opts = ['A', 'B', 'C', 'D', 'E'].filter(opt => (s['opsi_' + opt.toLowerCase()] || '').trim() !== '');
+      return `
+        <div class="space-y-2">
+          <div class="text-[11px] font-bold text-violet-700">Centang semua pilihan jawaban yang benar (dapat lebih dari 1):</div>
+          <div class="grid grid-cols-1 gap-2">
+            ${opts.map(opt => `
+              <label class="p-3 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-violet-400 cursor-pointer flex items-center gap-3 text-xs sm:text-sm font-semibold transition">
+                <input type="checkbox" value="${opt}" onchange="window.toggleEvalKompleks('${s.id}', '${opt}', this.checked)" class="w-4 h-4 accent-violet-600 rounded" />
+                <span class="w-6 h-6 rounded-lg bg-white border border-slate-300 flex items-center justify-center font-extrabold text-xs shrink-0">${opt}</span>
+                <span>${escapeHtml(s['opsi_' + opt.toLowerCase()])}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    if (tipe === 'benar_salah') {
+      return `
+        <div class="grid grid-cols-2 gap-3 max-w-md">
+          ${['Benar', 'Salah'].map(choice => `
+            <button type="button" onclick="window.pilihEval('${s.id}', '${choice}', this)" class="eval-opt-${s.id} p-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 hover:border-indigo-400 text-center text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2">
+              <span class="w-3 h-3 rounded-full ${choice === 'Benar' ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
+              <span>${choice}</span>
+            </button>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (tipe === 'menjodohkan') {
+      const kiri = Array.isArray(s.pasangan_kiri) ? s.pasangan_kiri : [];
+      const kanan = Array.isArray(s.pasangan_kanan) ? s.pasangan_kanan : [];
+      return `
+        <div class="space-y-2.5 bg-orange-50/70 p-3.5 rounded-2xl border border-orange-200">
+          <div class="text-[11px] font-extrabold text-orange-900">Pasangkan setiap pernyataan di sebelah kiri dengan pasangan yang tepat di sebelah kanan:</div>
+          ${kiri.map((itemKiri, idxK) => `
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center bg-white p-2.5 rounded-xl border border-orange-200">
+              <div class="sm:col-span-6 text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
+                <span class="w-5 h-5 rounded-md bg-orange-600 text-white text-[11px] font-extrabold flex items-center justify-center shrink-0">${idxK + 1}</span>
+                <span>${escapeHtml(itemKiri)}</span>
+              </div>
+              <div class="sm:col-span-6">
+                <select onchange="window.pilihEvalJodoh('${s.id}', ${idxK + 1}, this.value)" class="w-full px-3 py-2 rounded-xl bg-sky-50 border border-sky-300 text-xs font-extrabold text-sky-950">
+                  <option value="">-- Pilih Pasangan --</option>
+                  ${kanan.map((itemKanan, idxR) => {
+                    const kode = String.fromCharCode(65 + idxR);
+                    return `<option value="${kode}">${kode}. ${escapeHtml(itemKanan)}</option>`;
+                  }).join('')}
+                </select>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    if (tipe === 'isian_singkat') {
+      return `
+        <div class="max-w-md">
+          <input type="text" oninput="window.pilihEvalIsian('${s.id}', this.value)" placeholder="Ketik jawaban singkat Anda di sini..." class="w-full px-4 py-3 rounded-xl bg-teal-50/60 border-2 border-teal-300 focus:border-teal-600 focus:bg-white focus:outline-none text-sm font-extrabold text-slate-900" />
+        </div>
+      `;
+    }
+
+    return '';
+  }
+
+  window.pilihEval = (id, opt, btn) => {
+    evalAnswers[id] = opt;
+    document.querySelectorAll(`.eval-opt-${id}`).forEach(b => {
+      b.classList.remove('border-sky-600', 'bg-sky-100');
+      b.classList.add('border-slate-200', 'bg-slate-50');
+    });
+    btn.classList.remove('border-slate-200', 'bg-slate-50');
+    btn.classList.add('border-sky-600', 'bg-sky-100');
+  };
+
+  window.toggleEvalKompleks = (id, opt, checked) => {
+    const current = Array.isArray(evalAnswers[id]) ? evalAnswers[id] : [];
+    const set = new Set(current);
+    if (checked) set.add(opt);
+    else set.delete(opt);
+    evalAnswers[id] = Array.from(set).sort();
+  };
+
+  window.pilihEvalJodoh = (id, nomorKiri, kodeKanan) => {
+    if (!evalAnswers[id] || typeof evalAnswers[id] !== 'object' || Array.isArray(evalAnswers[id])) {
+      evalAnswers[id] = {};
+    }
+    if (kodeKanan) evalAnswers[id][nomorKiri] = kodeKanan;
+    else delete evalAnswers[id][nomorKiri];
+  };
+
+  window.pilihEvalIsian = (id, val) => {
+    evalAnswers[id] = val.trim();
+  };
+
+  function checkSoalCorrect(s, userAns) {
+    const tipe = s.tipe_soal || 'pg';
+    const kunciRaw = String(s.kunci_jawaban || '').trim();
+
+    if (tipe === 'pg') {
+      return String(userAns || '').toUpperCase() === kunciRaw.toUpperCase();
+    }
+    if (tipe === 'pg_kompleks') {
+      const expected = kunciRaw.split(',').map(x => x.trim().toUpperCase()).filter(Boolean).sort().join(',');
+      const actual = Array.isArray(userAns) ? userAns.map(x => x.toUpperCase()).sort().join(',') : '';
+      return expected !== '' && actual === expected;
+    }
+    if (tipe === 'benar_salah') {
+      return String(userAns || '').toLowerCase() === kunciRaw.toLowerCase();
+    }
+    if (tipe === 'menjodohkan') {
+      const pairs = kunciRaw.split(',').map(p => p.trim().toUpperCase()).filter(Boolean);
+      if (!pairs.length || !userAns || typeof userAns !== 'object') return false;
+      return pairs.every(pair => {
+        const [k, v] = pair.split('-');
+        return String(userAns[k] || '').toUpperCase() === v;
+      });
+    }
+    if (tipe === 'isian_singkat') {
+      const normUser = String(userAns || '').trim().toLowerCase().replace(',', '.');
+      const validList = kunciRaw.split('|').map(k => k.trim().toLowerCase().replace(',', '.'));
+      return normUser !== '' && validList.includes(normUser);
+    }
+    return false;
+  }
+
+  window.submitEvaluasi = async () => {
+    const soalList = getScopedBankSoal();
+    let benar = 0;
+    soalList.forEach(s => {
+      const disc = document.getElementById(`eval-disc-${s.id}`);
+      disc.classList.remove('hidden');
+      const isCorrect = checkSoalCorrect(s, evalAnswers[s.id]);
+      if (isCorrect) {
+        benar++;
+        disc.className = 'mt-3 p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-xs text-emerald-900 font-semibold';
+        disc.innerHTML = `<strong>Benar (Kunci: ${escapeHtml(s.kunci_jawaban)})!</strong> ${escapeHtml(s.pembahasan || '')}`;
+      } else {
+        disc.className = 'mt-3 p-3 rounded-xl bg-rose-50 border border-rose-300 text-xs text-rose-900 font-semibold';
+        disc.innerHTML = `<strong>Kurang Tepat (Kunci: ${escapeHtml(s.kunci_jawaban)}).</strong> ${escapeHtml(s.pembahasan || '')}`;
+      }
+    });
+    const skor = Math.round((benar / soalList.length) * 100);
+    await syncProgres({ skor_evaluasi: skor, evaluasi_selesai: true });
+    updateNavigationLockUI();
+    lucide.createIcons();
+
+    const box = document.getElementById('eval-score-box');
+    box.classList.remove('hidden');
+    box.className = `px-4 py-3 rounded-2xl font-extrabold text-sm ${skor >= 70 ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' : 'bg-amber-100 text-amber-900 border border-amber-300'}`;
+    box.innerHTML = `Nilai Evaluasi: <span class="text-lg">${skor}</span> / 100 (${benar}/${soalList.length} benar) — <button onclick="window.navigate('pencapaian')" class="underline ml-1">Buka Menu Pencapaian &rarr;</button>`;
+    showToast(`Nilai evaluasi ${skor} tersimpan! Menu Pencapaian kini terbuka.`, 'success');
+  };
+
+  function renderPencapaian(el) {
+    const p = state.progres;
+    const displayStudentName = state.currentUser ? state.currentUser.nama : 'Siswa (Akses Bebas)';
+    const badges = [
+      { title: 'Pembaca Tekun', desc: 'Menuntaskan 6 Sub-Materi Gerak Lurus', unlocked: p.materi_selesai, icon: 'book-open', grad: 'from-blue-500 to-sky-600' },
+      { title: 'Peneliti KPS', desc: 'Melakukan Simulasi Horizontal & Vertikal', unlocked: p.simulasi_selesai, icon: 'flask-conical', grad: 'from-orange-500 to-amber-500' },
+      { title: 'Penjelajah Konsep', desc: 'Menyelesaikan Eksplorasi & Refleksi', unlocked: p.eksplorasi_selesai, icon: 'compass', grad: 'from-violet-600 to-purple-600' },
+      { title: 'Master Gerak Lurus', desc: 'Meraih Nilai Evaluasi ≥ 70', unlocked: p.skor_evaluasi >= 70, icon: 'award', grad: 'from-emerald-500 to-teal-600' }
+    ];
+
+    el.innerHTML = `
+      <div class="glass-card rounded-3xl p-6 space-y-6">
+        <div>
+          <span class="px-3 py-1 rounded-full bg-teal-100 text-teal-800 text-xs font-extrabold">Urutan 05 • Rapor & Lencana</span>
+          <h2 class="text-2xl font-extrabold text-slate-900 mt-1">Pencapaian Belajar ${escapeHtml(displayStudentName)}</h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-center">
+            <div class="text-xs font-bold text-slate-500">Materi Konsep</div>
+            <div class="text-lg font-extrabold text-sky-800 mt-1">${p.materi_selesai ? 'Selesai ✓' : 'Proses'}</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-orange-50 border border-orange-200 text-center">
+            <div class="text-xs font-bold text-slate-500">Simulasi KPS</div>
+            <div class="text-lg font-extrabold text-orange-700 mt-1">${p.simulasi_selesai ? 'Selesai ✓' : 'Proses'}</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-violet-50 border border-violet-200 text-center">
+            <div class="text-xs font-bold text-slate-500">Skor Latihan</div>
+            <div class="text-lg font-extrabold text-violet-800 mt-1">${p.skor_latihan}</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+            <div class="text-xs font-bold text-slate-500">Nilai Evaluasi</div>
+            <div class="text-lg font-extrabold text-emerald-800 mt-1">${p.skor_evaluasi}</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          ${badges.map(b => `
+            <div class="p-5 rounded-2xl border-2 ${b.unlocked ? 'bg-white border-amber-300 shadow-md' : 'bg-slate-100/80 border-slate-200 opacity-60'} text-center">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br ${b.unlocked ? b.grad : 'from-slate-400 to-slate-500'} text-white flex items-center justify-center shadow mb-3">
+                <i data-lucide="${b.icon}" class="w-7 h-7"></i>
+              </div>
+              <div class="text-sm font-extrabold text-slate-900">${b.title}</div>
+              <div class="text-xs text-slate-600 mt-1">${b.desc}</div>
+              <span class="mt-3 inline-block px-2.5 py-0.5 rounded-full text-[10px] font-extrabold ${b.unlocked ? 'bg-amber-400 text-slate-950' : 'bg-slate-200 text-slate-600'}">
+                ${b.unlocked ? 'LENCANA TERBUKA' : 'TERKUNCI'}
+              </span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // =========================================================================
+  // 7. PANEL GURU / ADMIN (RUANG KERJA TERISOLASI PER GURU)
+  // =========================================================================
+  function renderAdmin(el) {
+    if (state.currentUser?.role !== 'admin') return;
+    const guruId = state.currentUser.id;
+    const mySiswaList = state.siswaList.filter(s => s.guru_id === guruId);
+    const mySoalList = state.bankSoal.filter(q => q.guru_id === guruId);
+    const myRefleksiList = state.refleksiList.filter(r => r.guru_id === guruId);
+
+    el.innerHTML = `
+      <div class="space-y-6">
+        <!-- Banner Identitas Ruang Guru -->
+        <div class="glass-card rounded-3xl p-5 bg-gradient-to-r from-sky-50 to-amber-50 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-[11px] font-extrabold">Ruang Kerja Terisolasi Per Guru</span>
+            <h2 class="text-xl font-extrabold text-slate-900 mt-1">Panel Guru: ${escapeHtml(state.currentUser.nama)}</h2>
+            <p class="text-xs text-slate-600">Siswa yang Anda tambahkan dan soal yang Anda buat hanya muncul pada akun Anda dan kelas Anda.</p>
+          </div>
+          <div class="flex gap-3 text-center">
+            <div class="px-4 py-2 rounded-2xl bg-white border border-sky-200">
+              <div class="text-lg font-extrabold text-sky-700">${mySiswaList.length}</div>
+              <div class="text-[10px] font-bold text-slate-500">Siswa Saya</div>
+            </div>
+            <div class="px-4 py-2 rounded-2xl bg-white border border-emerald-200">
+              <div class="text-lg font-extrabold text-emerald-700">${mySoalList.length}</div>
+              <div class="text-[10px] font-bold text-slate-500">Soal Saya</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kelola Siswa -->
+        <div class="glass-card rounded-3xl p-6">
+          <h3 class="text-lg font-extrabold text-slate-900 mb-3">1. Kelola Akun Siswa Kelas Anda</h3>
+          <form onsubmit="window.adminTambahSiswa(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+            <input id="adm-s-nama" type="text" required placeholder="Nama Lengkap" class="px-3.5 py-2.5 rounded-xl bg-white border-2 border-sky-200 text-xs font-bold" />
+            <input id="adm-s-kelas" type="text" required placeholder="Kelas (mis. XI IPA 1)" class="px-3.5 py-2.5 rounded-xl bg-white border-2 border-sky-200 text-xs font-bold" />
+            <input id="adm-s-user" type="text" required placeholder="Username / NIS" class="px-3.5 py-2.5 rounded-xl bg-white border-2 border-sky-200 text-xs font-bold" />
+            <div class="flex gap-2">
+              <input id="adm-s-pass" type="text" required placeholder="Password" class="w-full px-3.5 py-2.5 rounded-xl bg-white border-2 border-sky-200 text-xs font-bold" />
+              <button type="submit" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shrink-0">Tambah</button>
+            </div>
+          </form>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-sky-100 text-sky-900 font-extrabold">
+                <tr>
+                  <th class="p-3">Nama Siswa</th><th class="p-3">Kelas</th><th class="p-3">Username</th><th class="p-3">Password</th><th class="p-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-sky-100 bg-white">
+                ${mySiswaList.length ? mySiswaList.map(s => `
+                  <tr>
+                    <td class="p-3 font-bold">${escapeHtml(s.nama_lengkap)}</td>
+                    <td class="p-3">${escapeHtml(s.kelas)}</td>
+                    <td class="p-3 font-mono">${escapeHtml(s.username)}</td>
+                    <td class="p-3 font-mono">${escapeHtml(s.password)}</td>
+                    <td class="p-3 text-right">
+                      <button onclick="window.adminHapusSiswa('${s.id}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 font-bold">Hapus</button>
+                    </td>
+                  </tr>
+                `).join('') : `<tr><td colspan="5" class="p-4 text-center text-slate-500">Belum ada siswa di kelas Anda. Silakan tambahkan siswa baru di atas.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Kelola Bank Soal -->
+        <div class="glass-card rounded-3xl p-6">
+          <h3 class="text-lg font-extrabold text-slate-900 mb-1">2. Kelola Bank Soal Evaluasi Kelas Anda (Multi-Tipe & Opsi A–E)</h3>
+          <p class="text-xs text-slate-600 mb-3">Soal yang Anda buat di sini hanya akan muncul untuk siswa yang terdaftar di akun Anda.</p>
+          <form onsubmit="window.adminTambahSoal(event)" class="space-y-3 mb-4 bg-sky-50 p-4 rounded-2xl border border-sky-200">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Jenis / Tipe Soal</label>
+                <select id="adm-q-tipe" onchange="window.switchAdminSoalTipe()" class="w-full px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs font-extrabold text-sky-900">
+                  <option value="pg">1. Pilihan Ganda (Opsi A - E)</option>
+                  <option value="pg_kompleks">2. Pilihan Ganda Kompleks (Jawaban &gt; 1)</option>
+                  <option value="benar_salah">3. Benar / Salah</option>
+                  <option value="menjodohkan">4. Menjodohkan (3 Pasangan)</option>
+                  <option value="isian_singkat">5. Isian Singkat</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Sub-Materi</label>
+                <select id="adm-q-kat" class="w-full px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs font-extrabold">
+                  <option value="Jarak & Perpindahan">Jarak & Perpindahan</option>
+                  <option value="GLB">GLB</option>
+                  <option value="GLBB">GLBB</option>
+                  <option value="GVA">GVA</option>
+                  <option value="GVB">GVB</option>
+                  <option value="GJB">GJB</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Pembahasan</label>
+                <input id="adm-q-bahas" type="text" placeholder="Pembahasan singkat" class="w-full px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+              </div>
+            </div>
+
+            <input id="adm-q-tanya" type="text" required placeholder="Tulis pertanyaan atau pernyataan soal..." class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-sky-300 text-xs font-bold" />
+
+            <!-- Dynamic Form Fields per Tipe Soal -->
+            <div id="adm-q-dynamic-fields" class="space-y-3"></div>
+
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow">Simpan Soal ke Kelas Saya</button>
+          </form>
+          <div class="space-y-2">
+            ${mySoalList.length ? mySoalList.map((q, i) => {
+              const badge = getTipeSoalBadge(q.tipe_soal || 'pg');
+              return `
+                <div class="p-3 rounded-xl bg-white border border-sky-200 flex items-center justify-between gap-3 text-xs">
+                  <div>
+                    <span class="px-2 py-0.5 rounded bg-sky-100 text-sky-800 font-extrabold mr-1">${escapeHtml(q.kategori)}</span>
+                    <span class="px-2 py-0.5 rounded ${badge.cls} font-extrabold mr-1.5">${badge.label}</span>
+                    <strong>${i + 1}.</strong> ${escapeHtml(q.pertanyaan)}
+                    <span class="ml-1 text-emerald-700 font-extrabold">(Kunci: ${escapeHtml(q.kunci_jawaban)})</span>
+                  </div>
+                  <button onclick="window.adminHapusSoal('${q.id}')" class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-700 font-bold shrink-0">Hapus</button>
+                </div>
+              `;
+            }).join('') : `<div class="p-4 rounded-xl bg-white border border-sky-100 text-center text-xs text-slate-500">Belum ada soal evaluasi di akun Anda. Tambahkan soal melalui formulir di atas.</div>`}
+          </div>
+        </div>
+
+        <!-- Rekap Refleksi -->
+        <div class="glass-card rounded-3xl p-6">
+          <h3 class="text-lg font-extrabold text-slate-900 mb-3">3. Catatan Refleksi Belajar Siswa Kelas Anda</h3>
+          <div class="space-y-2.5">
+            ${myRefleksiList.length ? myRefleksiList.map(r => `
+              <div class="p-4 rounded-2xl bg-white border border-sky-200 text-xs space-y-1">
+                <div class="flex justify-between font-extrabold text-sky-900">
+                  <span>${escapeHtml(r.nama_siswa || 'Siswa')}</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900">Tingkat Paham: ${r.tingkat_paham}/5</span>
+                </div>
+                <p><strong>Pemahaman Inti:</strong> ${escapeHtml(r.pemahaman_inti)}</p>
+                <p><strong>Kesulitan:</strong> ${escapeHtml(r.bagian_sulit)}</p>
+              </div>
+            `).join('') : `<div class="p-4 rounded-2xl bg-white border border-sky-100 text-center text-xs text-slate-500">Belum ada catatan refleksi dari siswa Anda.</div>`}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  window.adminTambahSiswa = async (e) => {
+    e.preventDefault();
+    const payload = {
+      guru_id: state.currentUser.id,
+      nama_lengkap: document.getElementById('adm-s-nama').value.trim(),
+      kelas: document.getElementById('adm-s-kelas').value.trim(),
+      username: document.getElementById('adm-s-user').value.trim(),
+      password: document.getElementById('adm-s-pass').value.trim()
+    };
+    if (IS_PREVIEW) {
+      state.siswaList.unshift({ ...payload, id: 's-' + Date.now() });
+    } else if (supabase) {
+      const { data, error } = await supabase.from('siswa').insert([payload]).select().single();
+      if (error) return showToast('Gagal menambah siswa: ' + error.message, 'error');
+      state.siswaList.unshift(data);
+    }
+    renderAdmin(document.getElementById('view-container'));
+    window.switchAdminSoalTipe();
+    lucide.createIcons();
+    showToast('Akun siswa berhasil ditambahkan ke kelas Anda!', 'success');
+  };
+
+  window.adminHapusSiswa = async (id) => {
+    if (IS_PREVIEW) {
+      state.siswaList = state.siswaList.filter(s => s.id !== id);
+    } else if (supabase) {
+      await supabase.from('siswa').delete().eq('id', id).eq('guru_id', state.currentUser.id);
+      state.siswaList = state.siswaList.filter(s => s.id !== id);
+    }
+    renderAdmin(document.getElementById('view-container'));
+    window.switchAdminSoalTipe();
+    lucide.createIcons();
+  };
+
+  window.switchAdminSoalTipe = () => {
+    const tipeEl = document.getElementById('adm-q-tipe');
+    const box = document.getElementById('adm-q-dynamic-fields');
+    if (!tipeEl || !box) return;
+    const tipe = tipeEl.value;
+
+    if (tipe === 'pg') {
+      box.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+          <input id="adm-q-a" type="text" required placeholder="Opsi A" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-b" type="text" required placeholder="Opsi B" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-c" type="text" required placeholder="Opsi C" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-d" type="text" required placeholder="Opsi D" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-e" type="text" required placeholder="Opsi E" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+        </div>
+        <div class="max-w-xs">
+          <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Kunci Jawaban Benar</label>
+          <select id="adm-q-kunci-pg" class="w-full px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs font-extrabold">
+            <option value="A">Kunci: A</option>
+            <option value="B">Kunci: B</option>
+            <option value="C">Kunci: C</option>
+            <option value="D">Kunci: D</option>
+            <option value="E">Kunci: E</option>
+          </select>
+        </div>
+      `;
+    } else if (tipe === 'pg_kompleks') {
+      box.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-5 gap-2">
+          <input id="adm-q-a" type="text" required placeholder="Opsi A" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-b" type="text" required placeholder="Opsi B" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-c" type="text" required placeholder="Opsi C" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-d" type="text" required placeholder="Opsi D" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+          <input id="adm-q-e" type="text" required placeholder="Opsi E" class="px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Centang Kunci Jawaban Benar (Bisa lebih dari 1 opsi):</label>
+          <div class="flex flex-wrap gap-3">
+            ${['A', 'B', 'C', 'D', 'E'].map(opt => `
+              <label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-sky-300 text-xs font-extrabold cursor-pointer">
+                <input type="checkbox" value="${opt}" class="adm-q-kunci-kompleks accent-violet-600" /> Opsi ${opt}
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    } else if (tipe === 'benar_salah') {
+      box.innerHTML = `
+        <div class="max-w-xs">
+          <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Kunci Pernyataan</label>
+          <select id="adm-q-kunci-bs" class="w-full px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs font-extrabold">
+            <option value="Benar">Benar</option>
+            <option value="Salah">Salah</option>
+          </select>
+        </div>
+      `;
+    } else if (tipe === 'menjodohkan') {
+      box.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white p-3 rounded-xl border border-sky-200">
+          <div class="space-y-2">
+            <div class="text-[11px] font-extrabold text-orange-800">Kolom Kiri (Pernyataan 1, 2, 3)</div>
+            <input id="adm-jodoh-k1" type="text" required placeholder="1. Pernyataan kiri 1" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
+            <input id="adm-jodoh-k2" type="text" required placeholder="2. Pernyataan kiri 2" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
+            <input id="adm-jodoh-k3" type="text" required placeholder="3. Pernyataan kiri 3" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
+          </div>
+          <div class="space-y-2">
+            <div class="text-[11px] font-extrabold text-sky-800">Kolom Kanan (Pilihan A, B, C)</div>
+            <input id="adm-jodoh-r1" type="text" required placeholder="A. Pasangan kanan A" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
+            <input id="adm-jodoh-r2" type="text" required placeholder="B. Pasangan kanan B" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
+            <input id="adm-jodoh-r3" type="text" required placeholder="C. Pasangan kanan C" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 max-w-md">
+          <div>
+            <label class="block text-[10px] font-extrabold text-slate-600 mb-0.5">Kunci No. 1</label>
+            <select id="adm-jodoh-ans1" class="w-full px-2.5 py-1.5 rounded-lg bg-white border border-sky-300 text-xs font-extrabold">
+              <option value="A">1 - A</option><option value="B">1 - B</option><option value="C">1 - C</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-extrabold text-slate-600 mb-0.5">Kunci No. 2</label>
+            <select id="adm-jodoh-ans2" class="w-full px-2.5 py-1.5 rounded-lg bg-white border border-sky-300 text-xs font-extrabold">
+              <option value="A">2 - A</option><option value="B" selected>2 - B</option><option value="C">2 - C</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-extrabold text-slate-600 mb-0.5">Kunci No. 3</label>
+            <select id="adm-jodoh-ans3" class="w-full px-2.5 py-1.5 rounded-lg bg-white border border-sky-300 text-xs font-extrabold">
+              <option value="A">3 - A</option><option value="B">3 - B</option><option value="C" selected>3 - C</option>
+            </select>
+          </div>
+        </div>
+      `;
+    } else if (tipe === 'isian_singkat') {
+      box.innerHTML = `
+        <div class="max-w-md">
+          <label class="block text-[11px] font-extrabold text-slate-700 mb-1">Kunci Jawaban Singkat (pisahkan dengan | jika ada variasi jawaban, misal: 20|20 m/s)</label>
+          <input id="adm-q-kunci-isian" type="text" required placeholder="Contoh: 20 atau GLB" class="w-full px-3 py-2 rounded-xl bg-white border border-sky-300 text-xs font-extrabold" />
+        </div>
+      `;
+    }
+  };
+
+  window.adminTambahSoal = async (e) => {
+    e.preventDefault();
+    const tipe = document.getElementById('adm-q-tipe').value;
+    const payload = {
+      guru_id: state.currentUser.id,
+      tipe_soal: tipe,
+      kategori: document.getElementById('adm-q-kat').value,
+      pertanyaan: document.getElementById('adm-q-tanya').value.trim(),
+      opsi_a: '',
+      opsi_b: '',
+      opsi_c: '',
+      opsi_d: '',
+      opsi_e: '',
+      pasangan_kiri: [],
+      pasangan_kanan: [],
+      kunci_jawaban: '',
+      pembahasan: document.getElementById('adm-q-bahas').value.trim()
+    };
+
+    if (tipe === 'pg') {
+      payload.opsi_a = document.getElementById('adm-q-a').value.trim();
+      payload.opsi_b = document.getElementById('adm-q-b').value.trim();
+      payload.opsi_c = document.getElementById('adm-q-c').value.trim();
+      payload.opsi_d = document.getElementById('adm-q-d').value.trim();
+      payload.opsi_e = document.getElementById('adm-q-e').value.trim();
+      payload.kunci_jawaban = document.getElementById('adm-q-kunci-pg').value;
+    } else if (tipe === 'pg_kompleks') {
+      payload.opsi_a = document.getElementById('adm-q-a').value.trim();
+      payload.opsi_b = document.getElementById('adm-q-b').value.trim();
+      payload.opsi_c = document.getElementById('adm-q-c').value.trim();
+      payload.opsi_d = document.getElementById('adm-q-d').value.trim();
+      payload.opsi_e = document.getElementById('adm-q-e').value.trim();
+      const checked = Array.from(document.querySelectorAll('.adm-q-kunci-kompleks:checked')).map(c => c.value);
+      if (!checked.length) return showToast('Pilih minimal satu kunci jawaban benar untuk PG Kompleks!', 'error');
+      payload.kunci_jawaban = checked.join(',');
+    } else if (tipe === 'benar_salah') {
+      payload.opsi_a = 'Benar';
+      payload.opsi_b = 'Salah';
+      payload.kunci_jawaban = document.getElementById('adm-q-kunci-bs').value;
+    } else if (tipe === 'menjodohkan') {
+      payload.pasangan_kiri = [
+        document.getElementById('adm-jodoh-k1').value.trim(),
+        document.getElementById('adm-jodoh-k2').value.trim(),
+        document.getElementById('adm-jodoh-k3').value.trim()
+      ];
+      payload.pasangan_kanan = [
+        document.getElementById('adm-jodoh-r1').value.trim(),
+        document.getElementById('adm-jodoh-r2').value.trim(),
+        document.getElementById('adm-jodoh-r3').value.trim()
+      ];
+      const a1 = document.getElementById('adm-jodoh-ans1').value;
+      const a2 = document.getElementById('adm-jodoh-ans2').value;
+      const a3 = document.getElementById('adm-jodoh-ans3').value;
+      payload.kunci_jawaban = `1-${a1},2-${a2},3-${a3}`;
+    } else if (tipe === 'isian_singkat') {
+      payload.kunci_jawaban = document.getElementById('adm-q-kunci-isian').value.trim();
+    }
+
+    if (IS_PREVIEW) {
+      state.bankSoal.push({ ...payload, id: 'q-' + Date.now() });
+    } else if (supabase) {
+      const { data, error } = await supabase.from('bank_soal').insert([payload]).select().single();
+      if (error) return showToast('Gagal menyimpan soal: ' + error.message, 'error');
+      state.bankSoal.push(data);
+    }
+    renderAdmin(document.getElementById('view-container'));
+    window.switchAdminSoalTipe();
+    lucide.createIcons();
+    showToast('Soal evaluasi baru berhasil disimpan ke kelas Anda!', 'success');
+  };
+
+  window.adminHapusSoal = async (id) => {
+    if (IS_PREVIEW) {
+      state.bankSoal = state.bankSoal.filter(q => q.id !== id);
+    } else if (supabase) {
+      await supabase.from('bank_soal').delete().eq('id', id).eq('guru_id', state.currentUser.id);
+      state.bankSoal = state.bankSoal.filter(q => q.id !== id);
+    }
+    renderAdmin(document.getElementById('view-container'));
+    window.switchAdminSoalTipe();
+    lucide.createIcons();
+  };
+
+  (async function init() {
+    lucide.createIcons();
+    renderMath();
+    if (!IS_PREVIEW && supabase) {
+      // Muat hanya soal publik default (guru_id IS NULL) untuk akses tamu tanpa login
+      const { data: soalData } = await supabase.from('bank_soal').select('*').is('guru_id', null).order('created_at', { ascending: true });
+      if (soalData) state.bankSoal = soalData;
+
+      const { data } = await supabase.auth.getSession();
+      if (data?.session?.user) {
+        const displayNama = data.session.user.user_metadata?.nama_lengkap || data.session.user.email;
+        state.currentUser = {
+          id: data.session.user.id,
+          guru_id: data.session.user.id,
+          role: 'admin',
+          nama: displayNama,
+          kelas: 'Ruang Guru',
+          username: data.session.user.email
+        };
+        await loadUserDataFromSupabase();
+        const lbl = document.getElementById('landing-auth-btn-label');
+        if (lbl) lbl.textContent = `Lanjut (${state.currentUser.nama})`;
+      }
+    }
+  })();
+</script>
+</body>
+</html>
